@@ -19,3 +19,4 @@ executable FunctorsAndDragons
   hs-source-dirs:      src
   -- other-modules:       
   build-depends:       base ==4.6.*
+  build-depends:       ansi-terminal
