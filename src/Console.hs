@@ -19,7 +19,7 @@ draw world = do
     let hero = _whero world
 
     clearScreen
-    setCursorPosition (hero^.hxpos) (hero^.hypos)
+    setCursorPosition (hero^.hypos) (hero^.hxpos)
 
     setSGR [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Blue]
     putStr "@"
