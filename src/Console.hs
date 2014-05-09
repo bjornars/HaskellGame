@@ -3,6 +3,8 @@ module Console where
 import System.Console.ANSI
 import System.IO
 
+import Control.Lens
+
 import Types
 
 setupTerminal :: IO ()
@@ -14,10 +16,10 @@ setupTerminal =  do
 
 draw :: World -> IO ()
 draw world = do
-    let hero = _hero world
+    let hero = _whero world
 
     clearScreen
-    setCursorPosition (_ypos hero) (_xpos hero)
+    setCursorPosition (hero^.hxpos) (hero^.hypos)
 
     setSGR [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Blue]
     putStr "@"

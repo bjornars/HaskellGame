@@ -10,7 +10,7 @@ import Types
 main :: IO ()
 main = do
     setupTerminal
-    let world = World { _hero = Hero 0 0 }
+    let world = World { _whero = Hero 0 0 }
     draw world
 
     handle handler (gameLoop world draw getInput)

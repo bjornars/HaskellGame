@@ -20,3 +20,4 @@ executable FunctorsAndDragons
   -- other-modules:       
   build-depends:       base ==4.6.*
   build-depends:       ansi-terminal
+  build-depends:       lens
