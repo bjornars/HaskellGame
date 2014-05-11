@@ -2,12 +2,13 @@ module GameMap where
 
 import Types
 
-mbHeroSpawn, mbWall, mbEmpty, mbMonsterSpawn, mbTreasure :: MapBlock
+mbHeroSpawn, mbWall, mbEmpty, mbMonsterSpawn, mbMonster, mbTreasure :: MapBlock
 
 mbHeroSpawn    = '@'
 mbWall         = 'X'
 mbEmpty        = '.'
 mbMonsterSpawn = 'S'
+mbMonster      = '#'
 mbTreasure     = 'T'
 
 mapBlock1 :: Maybe Map
@@ -48,10 +49,10 @@ mapBlock1 = loadMap [
 
 
 loadMap :: [String] -> Maybe Map
-loadMap = sequence.fmap (sequence.fmap loadBlock) 
+loadMap = sequence.fmap (sequence.fmap loadBlock)
 
 loadBlock :: Char -> Maybe MapBlock
-loadBlock e 
+loadBlock e
     | e `elem` "X.ST@" = Just e
     | otherwise        = Nothing
 

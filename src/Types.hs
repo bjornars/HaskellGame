@@ -19,5 +19,7 @@ data World = World {
 
 data Hero = Hero {_hxpos :: Integer, _hypos :: Integer} deriving (Show)
 
+data MoveType = MTAttack | MTMove | MTChangeLevel | MTInvalid
+
 makeLenses ''Hero
 makeLenses ''World

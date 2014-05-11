@@ -36,9 +36,28 @@ tick world input = do
             (InputC 's') -> (whero.hypos) +~ 1
             _            -> id
 
+    -- only do the move if it is allowed.
+    let world'' = case getMoveType world' of
+            MTMove -> world'
+            _      -> world
+
     let done = case input of
             (InputS IEscape) -> True
             (InputC 'q') -> True
             _ -> False
 
-    return (world', done)
+    return (world'', done)
+
+
+getMoveType :: World -> MoveType
+getMoveType world = case world^.wmap.atHero of
+        -- mbEmpty   -> MTMove
+        -- mbMonster -> MTAttack
+        -- TODO: why is ghc-mod check complaining about this?
+        '.'          -> MTMove
+        '#'          -> MTAttack
+        _            -> MTInvalid
+
+    where hero = world^.whero
+          atHero = to $ index' (fromInteger $ hero^.hxpos) (fromInteger $ hero^.hypos)
+          index' x y map' = map' !! y !! x
