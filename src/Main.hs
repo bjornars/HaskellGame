@@ -11,7 +11,6 @@ main = do
     vty <- mkVty
     let action = getAction defaultKeys vty
         update = draw vty
-    handle handler $ startGame update action
-    shutdown vty
-  where handler :: AsyncException -> IO ()
-        handler _ = putStrLn "Uh oh!"
+
+    bracket_ (return ()) (shutdown vty)
+        $ startGame update action
