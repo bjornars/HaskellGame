@@ -5,12 +5,12 @@ import Types
 
 chrToMapBlock :: [(Char, MapBlock)]
 chrToMapBlock = [('@', HeroSpawn)
-             ,('X', Wall)
-             ,('.', Empty)
-             ,('S', MonsterSpawn)
-             ,('#', Monster)
-             ,('T', Treasure)
-             ]
+                ,('X', Wall)
+                ,('.', Empty)
+                ,('S', MonsterSpawn)
+                ,('#', Monster)
+                ,('T', Treasure)
+                ]
 
 mapBlockToChr :: [(MapBlock, Char)]
 mapBlockToChr = map swap chrToMapBlock
