@@ -6,11 +6,15 @@ import Control.Monad
 import Control.Lens
 
 import Types
+import GameMap
 
 
 startGame :: (World -> IO ()) -> IO Input -> IO ()
 startGame draw getInput = do
-    let world = World { _whero = Hero 0 0 }
+    let gameMap = forceMap mapBlock1
+    let heroPos = head $ findBlocks mbHeroSpawn gameMap
+
+    let world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
     draw world
     gameLoop world draw getInput
 
