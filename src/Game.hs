@@ -8,25 +8,26 @@ import Control.Lens
 import Types
 import GameMap
 
+type Game a = World -> IO a
 
 startGame :: (World -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap mapBlock1
         heroPos = head $ findBlocks mbHeroSpawn gameMap
         world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
-    gameLoop world draw getInput
+    gameLoop draw getInput world
+    return ()
 
-gameLoop :: World -> (World -> IO ()) -> IO GAction -> IO ()
-gameLoop world draw getAction = do
+gameLoop :: (World -> IO ()) -> IO GAction -> Game ()
+gameLoop draw getAction world = do
     draw world
     action <- getAction
     unless (action == Quit) $ do
-        world' <- tick world action
-        gameLoop world' draw getAction
+        tick action world >>= gameLoop draw getAction
 
 
-tick :: World -> GAction -> IO World
-tick world action = do
+tick :: GAction -> Game World
+tick action world = do
     let world' = world & case action of
             Move DUp    -> (whero.hxpos) -~ 1
             Move DDown  -> (whero.hxpos) +~ 1
