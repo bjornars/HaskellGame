@@ -1,6 +1,5 @@
 module Game
-( defaultWorld
-, gameLoop
+( startGame
 ) where
 
 import Control.Monad
@@ -8,12 +7,15 @@ import Control.Lens
 
 import Types
 
-defaultWorld :: World
-defaultWorld = World { _whero = Hero 0 0 }
 
+startGame :: (World -> IO ()) -> IO Input -> IO ()
+startGame draw getInput = do
+    let world = World { _whero = Hero 0 0 }
+    draw world
+    gameLoop world draw getInput
 
 gameLoop :: World -> (World -> IO ()) -> IO Input -> IO ()
-gameLoop world draw getInput = draw world >> go world
+gameLoop world draw getInput = go world
     where go w = do
               input <- getInput
               (w', done) <- tick w input
