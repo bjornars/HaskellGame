@@ -9,55 +9,41 @@ import Types
 import GameMap
 
 
-startGame :: (World -> IO ()) -> IO Input -> IO ()
+startGame :: (World -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap mapBlock1
-    let heroPos = head $ findBlocks mbHeroSpawn gameMap
-
-    let world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
-    draw world
+        heroPos = head $ findBlocks mbHeroSpawn gameMap
+        world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
     gameLoop world draw getInput
 
-gameLoop :: World -> (World -> IO ()) -> IO Input -> IO ()
-gameLoop world draw getInput = go world
-    where go w = do
-              input <- getInput
-              (w', done) <- tick w input
-              draw w'
-              unless done $ go w'
+gameLoop :: World -> (World -> IO ()) -> IO GAction -> IO ()
+gameLoop world draw getAction = do
+    draw world
+    action <- getAction
+    unless (action == Quit) $ do
+        world' <- tick world action
+        gameLoop world' draw getAction
 
 
-tick :: World -> Input -> IO (World, Bool)
-tick world input = do
-    let world' = world & case input of
-            (InputC 'a') -> (whero.hxpos) -~ 1
-            (InputC 'd') -> (whero.hxpos) +~ 1
-            (InputC 'w') -> (whero.hypos) -~ 1
-            (InputC 's') -> (whero.hypos) +~ 1
+tick :: World -> GAction -> IO World
+tick world action = do
+    let world' = world & case action of
+            Move DUp    -> (whero.hxpos) -~ 1
+            Move DDown  -> (whero.hxpos) +~ 1
+            Move DLeft  -> (whero.hypos) -~ 1
+            Move DRight -> (whero.hypos) +~ 1
             _            -> id
 
-    -- only do the move if it is allowed.
-    let world'' = case getMoveType world' of
-            MTMove -> world'
-            _      -> world
-
-    let done = case input of
-            (InputS IEscape) -> True
-            (InputC 'q') -> True
-            _ -> False
-
-    return (world'', done)
+    if validateAction world'
+        then return world'
+        else return world
 
 
-getMoveType :: World -> MoveType
-getMoveType world = case world^.wmap.atHero of
-        -- mbEmpty   -> MTMove
-        -- mbMonster -> MTAttack
-        -- TODO: why is ghc-mod check complaining about this?
-        '.'          -> MTMove
-        '#'          -> MTAttack
-        _            -> MTInvalid
-
+validateAction :: World -> Bool
+validateAction world = case world^.wmap.atHero of
+        '.'          -> True
+        '#'          -> True
+        _            -> False
     where hero = world^.whero
           atHero = to $ index' (fromInteger $ hero^.hxpos) (fromInteger $ hero^.hypos)
           index' x y map' = map' !! y !! x

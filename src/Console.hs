@@ -1,59 +1,43 @@
-module Console where
-
-import System.Console.ANSI
-import System.IO
+module Console
+( defaultKeys
+, draw
+, getAction
+) where
 
 import Control.Lens
+import Graphics.Vty
 
 import Types
 
-setupTerminal :: IO ()
-setupTerminal =  do
-    hSetEcho stdin False
-    hSetBuffering stdin  NoBuffering
-    hSetBuffering stdout NoBuffering
-    hideCursor
-
-draw :: World -> IO ()
-draw world = do
+draw :: Vty -> World -> IO ()
+draw vty world = do
     let hero = _whero world
+        heroAttr = with_fore_color def_attr bright_blue
+        xPos     = fromInteger $ hero^.hxpos
+        yPos     = fromInteger $ hero^.hypos
+        heroImg  = translate (yPos, xPos) $ string heroAttr "@"
+        picture  = pic_for_image heroImg
+    update vty $ picture { pic_cursor = NoCursor }
 
-    clearScreen
-    setCursorPosition (fromInteger $ hero^.hypos) (fromInteger $ hero^.hxpos)
+type KeyMap = [(Event, GAction)]
 
-    setSGR [SetConsoleIntensity BoldIntensity, SetColor Foreground Vivid Blue]
-    putStr "@"
+defaultKeys :: KeyMap
+defaultKeys =
+    [(EvKey KEsc [],         Quit)
+    ,(EvKey (KASCII 'q') [], Quit)
+    ,(EvKey KUp [],          Move DUp)
+    ,(EvKey (KASCII 'w') [], Move DUp)
+    ,(EvKey KDown [],        Move DDown)
+    ,(EvKey (KASCII 's') [], Move DDown)
+    ,(EvKey KLeft [],        Move DLeft)
+    ,(EvKey (KASCII 'a') [], Move DLeft)
+    ,(EvKey KRight [],       Move DRight)
+    ,(EvKey (KASCII 'd') [], Move DRight)
+    ]
 
-resetTerminal :: IO ()
-resetTerminal = do
-    clearScreen
-    setCursorPosition 0 0
-    setSGR [Reset]
-    showCursor
-    putStrLn "Bye"
-
-getInput :: IO Input
-getInput = do
-    input <- getTermInput
-    case input of
-        Just i -> return i
-        Nothing -> getInput
-
-getTermInput :: IO (Maybe Input)
-getTermInput = do
-    c <- getChar
-    if c == '\27' then getMetaChar else return $ Just $ InputC c
-
-getMetaChar :: IO (Maybe Input)
-getMetaChar = do
-    moreCharacters <- hReady stdin
-    if moreCharacters then do
-        c1 <- getChar
-        c2 <- getChar
-        return $ case [c1, c2] of
-            "[A" -> Just $ InputC 'w'
-            "[D" -> Just $ InputC 'a'
-            "[B" -> Just $ InputC 's'
-            "[C" -> Just $ InputC 'd'
-            _    -> Nothing
-        else return $ Just $ InputS IEscape
+getAction :: KeyMap -> Vty -> IO GAction
+getAction keyMap vty = do
+    ev <- next_event vty
+    case lookup ev keyMap of
+        Just action -> return action
+        _           -> getAction keyMap vty

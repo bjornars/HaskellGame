@@ -1,15 +1,17 @@
 module Main where
 
 import Control.Exception.Base
+import Graphics.Vty (mkVty, shutdown)
 
-import Console (setupTerminal, resetTerminal, getInput, draw)
-import Game (startGame)
+import Console
+import Game
 
 main :: IO ()
 main = do
-    setupTerminal
-    handle handler (startGame draw getInput)
-    resetTerminal
-
+    vty <- mkVty
+    let action = getAction defaultKeys vty
+        update = draw vty
+    handle handler $ startGame update action
+    shutdown vty
   where handler :: AsyncException -> IO ()
-        handler _ = return ()
+        handler _ = putStrLn "Uh oh!"

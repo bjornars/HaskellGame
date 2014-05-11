@@ -4,10 +4,18 @@ module Types where
 
 import Control.Lens
 
-data Input = InputC Char | InputS InputSymbol
-data InputSymbol = IEscape
+-- | Prefix directions with 'D' to not conflict with Either (Left, Right)
+data Direction = DUp | DDown | DLeft | DRight
+               deriving (Eq)
 
-type Tick = (World -> Input -> IO (World, Bool))
+-- | Game Action
+data GAction
+    = Quit
+    | Attack
+    | Move Direction
+    | ChangeLevel
+    | None
+    deriving (Eq)
 
 type Map = [[MapBlock]]
 type MapBlock = Char
@@ -18,8 +26,6 @@ data World = World {
 } deriving (Show)
 
 data Hero = Hero {_hxpos :: Integer, _hypos :: Integer} deriving (Show)
-
-data MoveType = MTAttack | MTMove | MTChangeLevel | MTInvalid
 
 makeLenses ''Hero
 makeLenses ''World
