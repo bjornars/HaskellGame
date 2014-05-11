@@ -43,5 +43,4 @@ validateAction world = case (world^.wmap) ! idx of
         Empty        -> True
         -- Monster      -> True
         _            -> False
-    where hero = world^.whero
-          idx  = ((hero^.hxpos), (hero^.hypos))
+    where idx  = (world^.whero.hxpos, world^.whero.hypos)

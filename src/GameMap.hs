@@ -58,10 +58,10 @@ mapBlock1 =
 
 loadMap :: [String] -> Maybe Map
 loadMap input = do
-    guard $ length input > 0
+    guard $ not .null $ input
     let h = toInteger $ length input
         w = toInteger . length . (!! 0) $ input
-    input' <- sequence . map chrToMapBlock . concat $ input
+    input' <- mapM chrToMapBlock . concat $ input
     return $ listArray ((0, 0), (h - 1, w - 1)) input'
 
 forceMap :: Maybe Map -> Map
