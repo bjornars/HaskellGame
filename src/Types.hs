@@ -20,6 +20,8 @@ data GAction
 type Map = [[MapBlock]]
 type MapBlock = Char
 
+type Game a = World -> IO a
+
 data World = World {
     _whero :: Hero,
     _wmap :: Map

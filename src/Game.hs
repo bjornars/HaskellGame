@@ -8,8 +8,6 @@ import Control.Lens
 import Types
 import GameMap
 
-type Game a = World -> IO a
-
 startGame :: (World -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap mapBlock1
