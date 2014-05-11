@@ -1,17 +1,24 @@
-module Game where
+module Game
+( defaultWorld
+, gameLoop
+) where
 
 import Control.Monad
 import Control.Lens
 
 import Types
 
-gameLoop :: World -> (World-> IO ()) -> IO Input -> IO ()
-gameLoop world draw getInput = go world where
-    go w = do
-         input <- getInput
-         (w', done) <- tick w input
-         draw w'
-         unless done $ go w'
+defaultWorld :: World
+defaultWorld = World { _whero = Hero 0 0 }
+
+
+gameLoop :: World -> (World -> IO ()) -> IO Input -> IO ()
+gameLoop world draw getInput = draw world >> go world
+    where go w = do
+              input <- getInput
+              (w', done) <- tick w input
+              draw w'
+              unless done $ go w'
 
 
 tick :: World -> Input -> IO (World, Bool)

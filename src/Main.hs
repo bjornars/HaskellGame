@@ -3,17 +3,12 @@ module Main where
 import Control.Exception.Base
 
 import Console (setupTerminal, resetTerminal, getInput, draw)
-import Game (gameLoop)
-import Types
-
+import Game
 
 main :: IO ()
 main = do
     setupTerminal
-    let world = World { _whero = Hero 0 0 }
-    draw world
-
-    handle handler (gameLoop world draw getInput)
+    handle handler (gameLoop defaultWorld draw getInput)
     resetTerminal
 
   where handler :: AsyncException -> IO ()
