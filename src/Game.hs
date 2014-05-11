@@ -27,10 +27,10 @@ gameLoop draw getAction world = do
 tick :: GAction -> Game World
 tick action world = do
     let world' = world & case action of
-            Move DUp    -> (whero.hxpos) -~ 1
-            Move DDown  -> (whero.hxpos) +~ 1
-            Move DLeft  -> (whero.hypos) -~ 1
-            Move DRight -> (whero.hypos) +~ 1
+            Move DUp    -> (whero.hypos) -~ 1
+            Move DDown  -> (whero.hypos) +~ 1
+            Move DLeft  -> (whero.hxpos) -~ 1
+            Move DRight -> (whero.hxpos) +~ 1
             _            -> id
 
     return $ if validateAction world'
