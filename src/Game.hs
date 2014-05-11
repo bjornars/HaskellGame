@@ -13,7 +13,7 @@ startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap $ loadMap mapBlock1
         heroPos = head $ findBlocks HeroSpawn gameMap
-        world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
+        world = World { _whero = uncurry Hero heroPos 10, _wmap = gameMap, _wmonsters = []}
     gameLoop draw getInput world
     return ()
 
@@ -41,7 +41,7 @@ tick action world = do
 validateAction :: World -> Bool
 validateAction world = case (world^.wmap) ! idx of
         Empty        -> True
-        Monster      -> True
+        -- Monster      -> True
         _            -> False
     where hero = world^.whero
           idx  = ((hero^.hxpos), (hero^.hypos))

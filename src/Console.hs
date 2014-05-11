@@ -24,12 +24,10 @@ draw vty world = do
     where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
 
 blockAttr :: MapBlock -> Attr
-blockAttr HeroSpawn    = with_fore_color def_attr bright_blue
-blockAttr Wall         = def_attr
-blockAttr Empty        = def_attr
-blockAttr MonsterSpawn = def_attr
-blockAttr Monster      = def_attr
+blockAttr HeroBlock    = with_fore_color def_attr bright_blue
+blockAttr MonsterBlock = with_fore_color def_attr bright_red
 blockAttr Treasure     = with_fore_color def_attr bright_yellow
+blockAttr _            = def_attr
 
 type KeyMap = [(Event, GAction)]
 

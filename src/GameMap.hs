@@ -5,12 +5,14 @@ import Data.Array.IArray
 import Types
 
 mapBlockToChr :: MapBlock -> Char
-mapBlockToChr HeroSpawn    = '@'
+mapBlockToChr HeroBlock    = '@'
 mapBlockToChr Wall         = 'X'
 mapBlockToChr Empty        = '.'
-mapBlockToChr MonsterSpawn = 'S'
-mapBlockToChr Monster      = '#'
+mapBlockToChr MonsterBlock = '#'
 mapBlockToChr Treasure     = 'T'
+
+mapBlockToChr MonsterSpawn = '@'
+mapBlockToChr HeroSpawn    = 'S'
 
 chrToMapBlock :: Char -> Maybe MapBlock
 chrToMapBlock c = lookup c assocList
