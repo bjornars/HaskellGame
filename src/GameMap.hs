@@ -11,8 +11,8 @@ mapBlockToChr Empty        = '.'
 mapBlockToChr MonsterBlock = '#'
 mapBlockToChr Treasure     = 'T'
 
-mapBlockToChr MonsterSpawn = '@'
-mapBlockToChr HeroSpawn    = 'S'
+mapBlockToChr MonsterSpawn = 'S'
+mapBlockToChr HeroSpawn    = '@'
 
 chrToMapBlock :: Char -> Maybe MapBlock
 chrToMapBlock c = lookup c assocList

@@ -13,7 +13,7 @@ import Types
 
 draw :: Vty -> Game ()
 draw vty world = do
-    let map' = amap drawCell (world^.wmap)
+    let map' = amap drawCell . addActors $ world
         (_, (h, w)) = bounds map'
         picture = pic_for_image . vert_cat $ do
             y <- [0 .. h]
@@ -22,6 +22,11 @@ draw vty world = do
                 return (map' ! (y, x))
     update vty $ picture { pic_cursor = NoCursor }
     where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
+
+addActors :: World -> Map
+addActors world = addHero (world^.whero) (world^.wmap)
+    where addHero :: Hero -> Map -> Map
+          addHero hero map' = map' // [(coords hero, HeroBlock)]
 
 blockAttr :: MapBlock -> Attr
 blockAttr HeroBlock    = with_fore_color def_attr bright_blue

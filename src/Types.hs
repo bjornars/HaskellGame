@@ -61,3 +61,15 @@ data MonsterType
 makeLenses ''Hero
 makeLenses ''Monster
 makeLenses ''World
+
+class Renderable a where
+    blockType :: a -> MapBlock
+    coords :: a -> Coords
+
+instance Renderable Hero where
+    blockType _ = HeroBlock
+    coords hero = (hero^.hxpos, hero^.hypos)
+
+instance Renderable Monster where
+    blockType _ = MonsterBlock
+    coords monster = (monster^.mxpos, monster^.mypos)
