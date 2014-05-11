@@ -1,19 +1,19 @@
 module GameMap where
 
-import Data.Tuple
+import Control.Monad
 import Types
 
-chrToMapBlock :: [(Char, MapBlock)]
-chrToMapBlock = [('@', HeroSpawn)
-                ,('X', Wall)
-                ,('.', Empty)
-                ,('S', MonsterSpawn)
-                ,('#', Monster)
-                ,('T', Treasure)
-                ]
+mapBlockToChr :: MapBlock -> Char
+mapBlockToChr HeroSpawn    = '@'
+mapBlockToChr Wall         = 'X'
+mapBlockToChr Empty        = '.'
+mapBlockToChr MonsterSpawn = 'S'
+mapBlockToChr Monster      = '#'
+mapBlockToChr Treasure     = 'T'
 
-mapBlockToChr :: [(MapBlock, Char)]
-mapBlockToChr = map swap chrToMapBlock
+chrToMapBlock :: Char -> Maybe MapBlock
+chrToMapBlock c = lookup c assocList
+    where assocList = map (liftM2 (,) mapBlockToChr id) [minBound ..]
 
 mapBlock1 :: Maybe Map
 mapBlock1 = loadMap [
@@ -53,8 +53,7 @@ mapBlock1 = loadMap [
 
 
 loadMap :: [String] -> Maybe Map
-loadMap = sequence.fmap (sequence.fmap loadCell)
-    where loadCell = flip lookup chrToMapBlock
+loadMap = sequence.fmap (sequence.fmap chrToMapBlock)
 
 forceMap :: Maybe Map -> Map
 forceMap (Just m) = m

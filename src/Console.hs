@@ -4,20 +4,26 @@ module Console
 , getAction
 ) where
 
-import Control.Lens
 import Graphics.Vty
 
+import GameMap
 import Types
 
 draw :: Vty -> Game ()
 draw vty world = do
-    let hero = _whero world
-        heroAttr = with_fore_color def_attr bright_blue
-        xPos     = fromInteger $ hero^.hxpos
-        yPos     = fromInteger $ hero^.hypos
-        heroImg  = translate (yPos, xPos) $ string heroAttr "@"
-        picture  = pic_for_image heroImg
+    let picture = pic_for_image . drawMap . _wmap $ world
     update vty $ picture { pic_cursor = NoCursor }
+    where drawMap = foldr1 (<->) . map drawRow
+          drawRow = foldr1 (<|>) . map drawCell
+          drawCell cell = string (blockAttr cell) (mapBlockToChr cell : [])
+
+blockAttr :: MapBlock -> Attr
+blockAttr HeroSpawn    = with_fore_color def_attr bright_blue
+blockAttr Wall         = def_attr
+blockAttr Empty        = def_attr
+blockAttr MonsterSpawn = def_attr
+blockAttr Monster      = def_attr
+blockAttr Treasure     = def_attr
 
 type KeyMap = [(Event, GAction)]
 

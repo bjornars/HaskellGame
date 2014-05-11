@@ -25,7 +25,7 @@ data MapBlock = HeroSpawn
               | MonsterSpawn
               | Monster
               | Treasure
-              deriving (Eq, Show)
+              deriving (Bounded, Enum, Eq, Show)
 
 type Game a = World -> IO a
 
