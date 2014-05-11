@@ -9,7 +9,7 @@ import Graphics.Vty
 
 import Types
 
-draw :: Vty -> World -> IO ()
+draw :: Vty -> Game ()
 draw vty world = do
     let hero = _whero world
         heroAttr = with_fore_color def_attr bright_blue

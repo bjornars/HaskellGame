@@ -8,7 +8,7 @@ import Control.Lens
 import Types
 import GameMap
 
-startGame :: (World -> IO ()) -> IO GAction -> IO ()
+startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap mapBlock1
         heroPos = head $ findBlocks mbHeroSpawn gameMap
@@ -16,7 +16,7 @@ startGame draw getInput = do
     gameLoop draw getInput world
     return ()
 
-gameLoop :: (World -> IO ()) -> IO GAction -> Game ()
+gameLoop :: Game () -> IO GAction -> Game ()
 gameLoop draw getAction world = do
     draw world
     action <- getAction
