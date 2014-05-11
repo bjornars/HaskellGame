@@ -4,13 +4,14 @@ module Game
 
 import Control.Monad
 import Control.Lens
+import Data.Array.IArray
 
 import Types
 import GameMap
 
 startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
-    let gameMap = forceMap mapBlock1
+    let gameMap = forceMap $ loadMap mapBlock1
         heroPos = head $ findBlocks HeroSpawn gameMap
         world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
     gameLoop draw getInput world
@@ -39,10 +40,9 @@ tick action world = do
 
 
 validateAction :: World -> Bool
-validateAction world = case world^.wmap.atHero of
+validateAction world = case (world^.wmap) ! idx of
         Empty        -> True
         Monster      -> True
         _            -> False
     where hero = world^.whero
-          atHero = to $ index' (fromInteger $ hero^.hxpos) (fromInteger $ hero^.hypos)
-          index' x y map' = map' !! y !! x
+          idx  = ((hero^.hxpos), (hero^.hypos))

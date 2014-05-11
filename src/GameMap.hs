@@ -1,6 +1,7 @@
 module GameMap where
 
 import Control.Monad
+import Data.Array.IArray
 import Types
 
 mapBlockToChr :: MapBlock -> Char
@@ -15,9 +16,9 @@ chrToMapBlock :: Char -> Maybe MapBlock
 chrToMapBlock c = lookup c assocList
     where assocList = map (liftM2 (,) mapBlockToChr id) [minBound ..]
 
-mapBlock1 :: Maybe Map
-mapBlock1 = loadMap [
-     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+mapBlock1 :: [String]
+mapBlock1 =
+    ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ,"X........................................X"
     ,"X....................................@...X"
     ,"X........................................X"
@@ -47,13 +48,19 @@ mapBlock1 = loadMap [
     ,"X.....................................XXXX"
     ,"X.....................................XXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXX"
-    ,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ]
+    ,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ]
 
 
 
 
 loadMap :: [String] -> Maybe Map
-loadMap = sequence.fmap (sequence.fmap chrToMapBlock)
+loadMap input = do
+    guard $ length input > 0
+    let h = toInteger $ length input
+        w = toInteger . length . (!! 0) $ input
+    input' <- sequence . map chrToMapBlock . concat $ input
+    return $ listArray ((0, 0), (h - 1, w - 1)) input'
 
 forceMap :: Maybe Map -> Map
 forceMap (Just m) = m
@@ -61,11 +68,4 @@ forceMap _ = error "Error loading map :("
 
 -- return a list of all coordinates for a given block type
 findBlocks :: MapBlock -> Map -> [(Integer, Integer)]
-findBlocks block = map fst . filter ((== block).snd) . indexBlocks
-
--- convert [[a]] to a list of coordinate-mapblock tuples
-indexBlocks :: Map -> [((Integer, Integer), MapBlock)]
-indexBlocks m = concatMap combine indexes
-    where rows = map (zip [0..]) m
-          indexes = zip [0..] rows
-          combine (y, xs) = map (\(x,val) -> ((x, y), val)) xs
+findBlocks block = map fst . filter ((== block).snd) . assocs

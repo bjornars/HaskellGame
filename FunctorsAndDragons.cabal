@@ -18,6 +18,7 @@ executable FunctorsAndDragons
   main-is:             Main.hs
   hs-source-dirs:      src
   -- other-modules:       
-  build-depends:       base ==4.6.*,
+  build-depends:       array,
+                       base ==4.6.*,
                        lens,
                        vty

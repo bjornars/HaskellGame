@@ -3,6 +3,7 @@
 module Types where
 
 import Control.Lens
+import Data.Array.IArray
 
 -- | Prefix directions with 'D' to not conflict with Either (Left, Right)
 data Direction = DUp | DDown | DLeft | DRight
@@ -17,7 +18,7 @@ data GAction
     | None
     deriving (Eq)
 
-type Map = [[MapBlock]]
+type Map = Array (Integer, Integer) MapBlock
 
 data MapBlock = HeroSpawn
               | Wall

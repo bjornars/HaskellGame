@@ -4,6 +4,8 @@ module Console
 , getAction
 ) where
 
+import Control.Lens
+import Data.Array.IArray
 import Graphics.Vty
 
 import GameMap
@@ -11,11 +13,15 @@ import Types
 
 draw :: Vty -> Game ()
 draw vty world = do
-    let picture = pic_for_image . drawMap . _wmap $ world
+    let map' = amap drawCell (world^.wmap)
+        (_, (h, w)) = bounds map'
+        picture = pic_for_image . vert_cat $ do
+            y <- [0 .. h]
+            return . horiz_cat $ do
+                x <- [0 .. w]
+                return (map' ! (y, x))
     update vty $ picture { pic_cursor = NoCursor }
-    where drawMap = foldr1 (<->) . map drawRow
-          drawRow = foldr1 (<|>) . map drawCell
-          drawCell cell = string (blockAttr cell) (mapBlockToChr cell : [])
+    where drawCell cell = string (blockAttr cell) (mapBlockToChr cell : [])
 
 blockAttr :: MapBlock -> Attr
 blockAttr HeroSpawn    = with_fore_color def_attr bright_blue
