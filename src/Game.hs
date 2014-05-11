@@ -21,8 +21,7 @@ gameLoop :: Game () -> IO GAction -> Game ()
 gameLoop draw getAction world = do
     draw world
     action <- getAction
-    unless (action == Quit) $ do
-        tick action world >>= gameLoop draw getAction
+    unless (action == Quit) $ tick action world >>= gameLoop draw getAction
 
 
 tick :: GAction -> Game World
@@ -34,9 +33,9 @@ tick action world = do
             Move DRight -> (whero.hypos) +~ 1
             _            -> id
 
-    if validateAction world'
-        then return world'
-        else return world
+    return $ if validateAction world'
+        then world'
+        else world
 
 
 validateAction :: World -> Bool

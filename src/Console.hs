@@ -21,7 +21,7 @@ draw vty world = do
                 x <- [0 .. w]
                 return (map' ! (y, x))
     update vty $ picture { pic_cursor = NoCursor }
-    where drawCell cell = string (blockAttr cell) (mapBlockToChr cell : [])
+    where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
 
 blockAttr :: MapBlock -> Attr
 blockAttr HeroSpawn    = with_fore_color def_attr bright_blue
