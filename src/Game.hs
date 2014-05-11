@@ -11,7 +11,7 @@ import GameMap
 startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap mapBlock1
-        heroPos = head $ findBlocks mbHeroSpawn gameMap
+        heroPos = head $ findBlocks HeroSpawn gameMap
         world = World { _whero = uncurry Hero heroPos, _wmap = gameMap}
     gameLoop draw getInput world
     return ()
@@ -40,8 +40,8 @@ tick action world = do
 
 validateAction :: World -> Bool
 validateAction world = case world^.wmap.atHero of
-        '.'          -> True
-        '#'          -> True
+        Empty        -> True
+        Monster      -> True
         _            -> False
     where hero = world^.whero
           atHero = to $ index' (fromInteger $ hero^.hxpos) (fromInteger $ hero^.hypos)

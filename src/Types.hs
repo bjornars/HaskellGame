@@ -18,7 +18,14 @@ data GAction
     deriving (Eq)
 
 type Map = [[MapBlock]]
-type MapBlock = Char
+
+data MapBlock = HeroSpawn
+              | Wall
+              | Empty
+              | MonsterSpawn
+              | Monster
+              | Treasure
+              deriving (Eq, Show)
 
 type Game a = World -> IO a
 

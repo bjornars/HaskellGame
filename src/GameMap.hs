@@ -1,15 +1,19 @@
 module GameMap where
 
+import Data.Tuple
 import Types
 
-mbHeroSpawn, mbWall, mbEmpty, mbMonsterSpawn, mbMonster, mbTreasure :: MapBlock
+chrToMapBlock :: [(Char, MapBlock)]
+chrToMapBlock = [('@', HeroSpawn)
+             ,('X', Wall)
+             ,('.', Empty)
+             ,('S', MonsterSpawn)
+             ,('#', Monster)
+             ,('T', Treasure)
+             ]
 
-mbHeroSpawn    = '@'
-mbWall         = 'X'
-mbEmpty        = '.'
-mbMonsterSpawn = 'S'
-mbMonster      = '#'
-mbTreasure     = 'T'
+mapBlockToChr :: [(MapBlock, Char)]
+mapBlockToChr = map swap chrToMapBlock
 
 mapBlock1 :: Maybe Map
 mapBlock1 = loadMap [
@@ -49,19 +53,15 @@ mapBlock1 = loadMap [
 
 
 loadMap :: [String] -> Maybe Map
-loadMap = sequence.fmap (sequence.fmap loadBlock)
-
-loadBlock :: Char -> Maybe MapBlock
-loadBlock e
-    | e `elem` "X.ST@" = Just e
-    | otherwise        = Nothing
+loadMap = sequence.fmap (sequence.fmap loadCell)
+    where loadCell = flip lookup chrToMapBlock
 
 forceMap :: Maybe Map -> Map
 forceMap (Just m) = m
 forceMap _ = error "Error loading map :("
 
 -- return a list of all coordinates for a given block type
-findBlocks :: Char -> Map -> [(Integer, Integer)]
+findBlocks :: MapBlock -> Map -> [(Integer, Integer)]
 findBlocks block = map fst . filter ((== block).snd) . indexBlocks
 
 -- convert [[a]] to a list of coordinate-mapblock tuples
