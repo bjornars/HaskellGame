@@ -17,10 +17,10 @@ gameLoop world draw getInput = go world where
 tick :: World -> Input -> IO (World, Bool)
 tick world input = do
     let world' = world & case input of
-            (InputC 'a') -> (whero.hxpos) %~ pred
-            (InputC 'd') -> (whero.hxpos) %~ succ
-            (InputC 'w') -> (whero.hypos) %~ pred
-            (InputC 's') -> (whero.hypos) %~ succ
+            (InputC 'a') -> (whero.hxpos) -~ 1
+            (InputC 'd') -> (whero.hxpos) +~ 1
+            (InputC 'w') -> (whero.hypos) -~ 1
+            (InputC 's') -> (whero.hypos) +~ 1
             _            -> id
 
     let done = case input of
