@@ -29,7 +29,7 @@ blockAttr Wall         = def_attr
 blockAttr Empty        = def_attr
 blockAttr MonsterSpawn = def_attr
 blockAttr Monster      = def_attr
-blockAttr Treasure     = def_attr
+blockAttr Treasure     = with_fore_color def_attr bright_yellow
 
 type KeyMap = [(Event, GAction)]
 
