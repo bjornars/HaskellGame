@@ -2,6 +2,7 @@ module Game
 ( startGame
 ) where
 
+import Control.Arrow
 import Control.Monad
 import Control.Lens
 import Data.Array.IArray
@@ -12,8 +13,8 @@ import GameMap
 startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = forceMap $ loadMap mapBlock1
-        heroPos = head $ findBlocks HeroSpawn gameMap
-        world = World { _whero = uncurry Hero heroPos 10, _wmap = gameMap, _wmonsters = []}
+        (newMap, hero, monsters) = extractActorsFromMap gameMap
+        world = World { _whero = hero, _wmap = newMap, _wmonsters = monsters}
     gameLoop draw getInput world
     return ()
 
@@ -44,3 +45,15 @@ validateAction world = case (world^.wmap) ! idx of
         -- Monster      -> True
         _            -> False
     where idx  = (world^.whero.hxpos, world^.whero.hypos)
+
+extractActorsFromMap :: Map -> (Map, Hero, [Monster])
+extractActorsFromMap map' = (monsterlessMap, makeHero heroes, makeMonsters monsters)
+    where (heroes, herolessMap) = splitOut HeroSpawn map'
+          (monsters, monsterlessMap) = splitOut MonsterSpawn herolessMap
+          makeHero hs = uncurry Hero (fst.head $ hs) 20
+          makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
+
+splitOut :: MapBlock -> Map -> ([((Integer, Integer), MapBlock)], Map)
+splitOut bType map' = (blocks, remainingMap)
+    where blocks = findBlocks bType map'
+          remainingMap =  map' // map (second (const Empty)) blocks

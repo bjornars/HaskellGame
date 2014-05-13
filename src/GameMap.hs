@@ -69,5 +69,5 @@ forceMap (Just m) = m
 forceMap _ = error "Error loading map :("
 
 -- return a list of all coordinates for a given block type
-findBlocks :: MapBlock -> Map -> [(Integer, Integer)]
-findBlocks block = map fst . filter ((== block).snd) . assocs
+findBlocks :: MapBlock -> Map -> [((Integer, Integer), MapBlock)]
+findBlocks block = filter ((== block).snd) . assocs
