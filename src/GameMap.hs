@@ -1,7 +1,9 @@
 module GameMap where
 
+import Control.Applicative
 import Control.Monad
 import Data.Array.IArray
+import Data.Maybe
 import Types
 
 mapBlockToChr :: MapBlock -> Char
@@ -57,16 +59,14 @@ mapBlock1 =
 
 
 loadMap :: [String] -> Maybe Map
-loadMap input = do
-    guard $ not .null $ input
+loadMap input =
+    if null input || any null input then Nothing else
     let h = toInteger $ length input
-        w = toInteger . length . (!! 0) $ input
-    input' <- mapM chrToMapBlock . concat $ input
-    return $ listArray ((0, 0), (h - 1, w - 1)) input'
+        w = toInteger . length . head $ input in
+    listArray ((0, 0), (h - 1, w - 1)) <$> mapM chrToMapBlock (concat input)
 
 forceMap :: Maybe Map -> Map
-forceMap (Just m) = m
-forceMap _ = error "Error loading map :("
+forceMap = fromMaybe (error "Error loading map :(")
 
 -- return a list of all coordinates for a given block type
 findBlocks :: MapBlock -> Map -> [((Integer, Integer), MapBlock)]
