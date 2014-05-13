@@ -24,9 +24,9 @@ draw vty world = do
     where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
 
 addActors :: World -> Map
-addActors world = addHero (world^.whero) (world^.wmap)
-    where addHero :: Hero -> Map -> Map
-          addHero hero map' = map' // [(coords hero, HeroBlock)]
+addActors world = addMonsters (world^.wmonsters) $ addHero (world^.whero) $ world^.wmap
+    where addHero hero = (// [(coords hero, HeroBlock)])
+          addMonsters monsters  = (// zip (map coords monsters) (repeat MonsterBlock))
 
 blockAttr :: MapBlock -> Attr
 blockAttr HeroBlock    = with_fore_color def_attr bright_blue
