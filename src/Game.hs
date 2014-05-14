@@ -35,7 +35,7 @@ tick action world = do
             _            -> id
 
     return $ if validateAction world'
-        then world'
+        then moveMonsters world'
         else world
 
 
@@ -57,3 +57,26 @@ splitOut :: MapBlock -> Map -> ([((Integer, Integer), MapBlock)], Map)
 splitOut bType map' = (blocks, remainingMap)
     where blocks = findBlocks bType map'
           remainingMap =  map' // map (second (const Empty)) blocks
+
+moveMonsters :: World -> World
+moveMonsters world = over wmonsters (map (moveMonster (world^.wmap) (world^.whero))) world
+
+(|-|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
+(x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
+
+moveMonster :: Map -> Hero -> Monster -> Monster
+moveMonster map' hero monster =
+    let (x, y) = coords monster &
+            case () of
+               _ | fst vector > 0 -> first succ
+               _ | fst vector < 0 -> first pred
+               _ | snd vector > 0 -> second succ
+               _ | snd vector < 0 -> second pred
+               _ -> id in
+
+    if map' ! (x,y) == Empty then
+        monster { _mxpos = x, _mypos = y }
+    else
+        monster
+
+    where vector = coords hero |-| coords monster
