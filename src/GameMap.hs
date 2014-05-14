@@ -18,7 +18,7 @@ mapBlockToChr HeroSpawn    = '@'
 
 chrToMapBlock :: Char -> Maybe MapBlock
 chrToMapBlock c = lookup c assocList
-    where assocList = map (liftM2 (,) mapBlockToChr id) [minBound ..]
+    where assocList = map ((,) <$> mapBlockToChr <*> id) [minBound ..]
 
 mapBlock1 :: [String]
 mapBlock1 =
