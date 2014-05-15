@@ -24,6 +24,7 @@ data MapBlock = HeroSpawn -- map blueprint only
               | HeroBlock
               | Wall
               | Empty
+              | Void
               | MonsterSpawn -- map blueprint only
               | MonsterBlock -- map blueprint only
               | Treasure

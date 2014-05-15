@@ -10,6 +10,7 @@ mapBlockToChr :: MapBlock -> Char
 mapBlockToChr HeroBlock    = '@'
 mapBlockToChr Wall         = 'X'
 mapBlockToChr Empty        = '.'
+mapBlockToChr Void         = ' '
 mapBlockToChr MonsterBlock = '#'
 mapBlockToChr Treasure     = 'T'
 
@@ -28,8 +29,8 @@ mapBlock1 =
     ,"X........................................X"
     ,"X........................................X"
     ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ,"X....X   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ,"X....X   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXX"
