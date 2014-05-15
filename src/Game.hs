@@ -73,10 +73,11 @@ moveMonster map' hero monster =
         vector = coords hero |-| coords monster
         directions = [
                (nfst vector, first succ),
-               (fst vector, first pred),
+               ( fst vector, first pred),
                (nsnd vector, second succ),
-               (snd vector, second pred)]
-        (x, y) = (snd.head $ sortBy (comparing fst)  directions) (coords monster)
+               ( snd vector, second pred)]
+        move = snd.head $ sortBy (comparing fst) directions
+        (x, y) = move $ coords monster
     in
         if map' ! (x,y) == Empty then
             monster { _mxpos = x, _mypos = y }
