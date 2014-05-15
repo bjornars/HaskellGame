@@ -20,6 +20,7 @@ startGame draw getInput = do
     gameLoop draw getInput world
     return ()
 
+
 gameLoop :: Game () -> IO GAction -> Game ()
 gameLoop draw getAction world = do
     draw world
@@ -48,6 +49,7 @@ validateAction world = case (world^.wmap) ! idx of
         _            -> False
     where idx  = (world^.whero.hxpos, world^.whero.hypos)
 
+
 extractActorsFromMap :: Map -> (Map, Hero, [Monster])
 extractActorsFromMap map' = (monsterlessMap, makeHero heroes, makeMonsters monsters)
     where (heroes, herolessMap) = splitOut HeroSpawn map'
@@ -55,16 +57,23 @@ extractActorsFromMap map' = (monsterlessMap, makeHero heroes, makeMonsters monst
           makeHero hs = uncurry Hero (fst.head $ hs) 20
           makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
 
+
 splitOut :: MapBlock -> Map -> ([((Integer, Integer), MapBlock)], Map)
 splitOut bType map' = (blocks, remainingMap)
     where blocks = findBlocks bType map'
           remainingMap =  map' // map (second (const Empty)) blocks
 
+
 moveMonsters :: World -> World
-moveMonsters world = over wmonsters (map (moveMonster (world^.wmap) (world^.whero))) world
+moveMonsters world = wmonsters %~ map moveMonster' $ world
+    where m = world^.wmap
+          h = world^.whero
+          moveMonster' = moveMonster m h
+
 
 (|-|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 (x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
+
 
 moveMonster :: Map -> Hero -> Monster -> Monster
 moveMonster map' hero monster =
@@ -83,4 +92,3 @@ moveMonster map' hero monster =
             monster { _mxpos = x, _mypos = y }
         else
             monster
-
