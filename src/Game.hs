@@ -6,6 +6,8 @@ import Control.Arrow
 import Control.Monad
 import Control.Lens
 import Data.Array.IArray
+import Data.List
+import Data.Ord
 
 import Types
 import GameMap
@@ -66,17 +68,18 @@ moveMonsters world = over wmonsters (map (moveMonster (world^.wmap) (world^.wher
 
 moveMonster :: Map -> Hero -> Monster -> Monster
 moveMonster map' hero monster =
-    let (x, y) = coords monster &
-            case () of
-               _ | fst vector > 0 -> first succ
-               _ | fst vector < 0 -> first pred
-               _ | snd vector > 0 -> second succ
-               _ | snd vector < 0 -> second pred
-               _ -> id in
+    let nfst = negate . fst
+        nsnd = negate . snd
+        vector = coords hero |-| coords monster
+        directions = [
+               (nfst vector, first succ),
+               (fst vector, first pred),
+               (nsnd vector, second succ),
+               (snd vector, second pred)]
+        (x, y) = (snd.head $ sortBy (comparing fst)  directions) (coords monster)
+    in
+        if map' ! (x,y) == Empty then
+            monster { _mxpos = x, _mypos = y }
+        else
+            monster
 
-    if map' ! (x,y) == Empty then
-        monster { _mxpos = x, _mypos = y }
-    else
-        monster
-
-    where vector = coords hero |-| coords monster
