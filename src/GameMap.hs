@@ -1,7 +1,6 @@
 module GameMap where
 
 import Control.Applicative
-import Control.Monad
 import Data.Array.IArray
 import Data.Maybe
 import Types
