@@ -1,4 +1,12 @@
-module GameMap where
+module GameMap (
+    mapBlock1
+  , fillVoid
+  , loadMap
+  , forceMap
+  , findBlocks
+  , mapBlockToChr
+) where
+
 
 import Control.Applicative
 import Data.Array.IArray
@@ -56,8 +64,6 @@ mapBlock1 =
     ]
 
 
-
-
 loadMap :: [String] -> Maybe Map
 loadMap input =
     if null input || any null input then Nothing else
@@ -67,6 +73,48 @@ loadMap input =
 
 forceMap :: Maybe Map -> Map
 forceMap = fromMaybe (error "Error loading map :(")
+
+fillVoid :: Map -> Map
+fillVoid m =
+    let neighbormap = makeNeighborList m
+        newBlock blocks = if all (`elem` [Void, Wall]) blocks then Void else head blocks
+        in
+    amap newBlock neighbormap
+
+
+offsetArr :: (Num a, Ix a) => Array (a, a) e -> (a, a) -> Array (a, a) e
+offsetArr arr offset =
+    let (b1, b2) = bounds arr in
+    array (b1 |+| offset, b2 |+| offset) [(i |+| offset, arr ! i) | i <- range (b1, b2)]
+
+
+growArr, shrinkArr :: (Num a, Ix a) => Array (a, a) [e] -> Array (a, a) [e]
+growArr arr =
+    let (b1, b2) = bounds arr
+        (b1', b2') = (b1 |-| (1, 1), b2 |+| (1, 1))
+    in
+    -- make a new map filled with empty lists that is one block bigger in all dimensions
+    -- and then fill it with the original array
+    array (b1', b2') [(i, []) | i <- range (b1', b2')] //
+        [(i, arr ! i) | i <- range (b1, b2)]
+
+
+shrinkArr arr =
+    let (b1, b2) = bounds arr
+        (b1', b2') = (b1 |+| (1, 1), b2 |-| (1, 1))
+    in
+    array (b1', b2') [(i, arr ! i) | i <- range (b1', b2')]
+
+
+makeNeighborList :: MapArray MapBlock -> MapArray [MapBlock]
+makeNeighborList map' =
+    let listMap = amap (:[]) map'
+        offsets = [(y, x) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 && y/= 0]
+        offsetMaps = map (offsetArr listMap) offsets
+        combinedMap = shrinkArr $ foldr (\omap lmap -> accum (++) lmap (assocs omap)) (growArr listMap) offsetMaps
+            in
+    combinedMap
+
 
 -- return a list of all coordinates for a given block type
 findBlocks :: MapBlock -> Map -> [((Integer, Integer), MapBlock)]

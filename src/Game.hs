@@ -14,9 +14,10 @@ import GameMap
 
 startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
-    let gameMap = forceMap $ loadMap mapBlock1
+    let gameMap = fillVoid $ forceMap $ loadMap mapBlock1
         (newMap, hero, monsters) = extractActorsFromMap gameMap
         world = World { _whero = hero, _wmap = newMap, _wmonsters = monsters}
+
     gameLoop draw getInput world
     return ()
 
@@ -69,10 +70,6 @@ moveMonsters world = wmonsters %~ map moveMonster' $ world
     where m = world^.wmap
           h = world^.whero
           moveMonster' = moveMonster m h
-
-
-(|-|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
-(x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
 
 
 moveMonster :: Map -> Hero -> Monster -> Monster

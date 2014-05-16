@@ -18,7 +18,8 @@ data GAction
     | None
     deriving (Eq)
 
-type Map = Array (Integer, Integer) MapBlock
+type MapArray a = Array (Integer, Integer) a
+type Map = MapArray MapBlock
 
 data MapBlock = HeroSpawn -- map blueprint only
               | HeroBlock
@@ -74,3 +75,8 @@ instance Renderable Hero where
 instance Renderable Monster where
     blockType _ = MonsterBlock
     coords monster = (monster^.mxpos, monster^.mypos)
+
+
+(|-|), (|+|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
+(x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
+(x1, y1) |+| (x2, y2) = (x1 + x2, y1 + y2)
