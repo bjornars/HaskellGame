@@ -16,7 +16,7 @@ startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
     let gameMap = fillVoid $ forceMap $ loadMap mapBlock1
         (newMap, hero, monsters) = extractActorsFromMap gameMap
-        world = World { _whero = hero, _wmap = newMap, _wmonsters = monsters}
+        world = GameState { _whero = hero, _wmap = newMap, _wmonsters = monsters}
 
     gameLoop draw getInput world
     return ()
@@ -32,7 +32,7 @@ gameLoop draw getAction = go
                 go $ tick action world
 
 
-tick :: GAction -> World -> World
+tick :: GAction -> GameState -> GameState
 tick action world = let
         world' = world & case action of
             Move DUp    -> (whero.hxpos) -~ 1
@@ -46,7 +46,7 @@ tick action world = let
         else world
 
 
-validateAction :: World -> Bool
+validateAction :: GameState -> Bool
 validateAction world = case (world^.wmap) ! idx of
         Empty        -> True
         -- Monster      -> True
@@ -68,7 +68,7 @@ splitOut bType map' = (blocks, remainingMap)
           remainingMap =  map' // map (second (const Empty)) blocks
 
 
-moveMonsters :: World -> World
+moveMonsters :: GameState -> GameState
 moveMonsters world = wmonsters %~ map moveMonster' $ world
     where m = world^.wmap
           h = world^.whero

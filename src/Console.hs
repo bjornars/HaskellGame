@@ -23,7 +23,7 @@ draw vty world = do
     update vty $ picture { pic_cursor = NoCursor }
     where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
 
-addActors :: World -> Map
+addActors :: GameState -> Map
 addActors world = addMonsters (world^.wmonsters) $ addHero (world^.whero) $ world^.wmap
     where addHero hero = (// [(coords hero, HeroBlock)])
           addMonsters monsters  = (// zip (map coords monsters) (repeat MonsterBlock))

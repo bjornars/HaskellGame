@@ -31,9 +31,9 @@ data MapBlock = HeroSpawn -- map blueprint only
               | Treasure
               deriving (Bounded, Enum, Eq, Show)
 
-type Game a = World -> IO a
+type Game a = GameState -> IO a
 
-data World = World {
+data GameState = GameState {
     _whero :: Hero,
     _wmonsters :: [Monster],
     _wmap :: Map
@@ -62,7 +62,7 @@ data MonsterType
 
 makeLenses ''Hero
 makeLenses ''Monster
-makeLenses ''World
+makeLenses ''GameState
 
 class Renderable a where
     blockType :: a -> MapBlock
