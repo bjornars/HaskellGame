@@ -74,12 +74,17 @@ loadLevel input =
 forceLevel :: Maybe Level -> Level
 forceLevel = fromMaybe (error "Error loading map :(")
 
+
+{- Find all squares that are surrounded by Void or Wall. and convert them to Voids.
+ - This works by making copies of the map that are offset by +/-1 in all directions,
+ - and then merging them together by appending duplicate values in a list, and then
+ - checking the resulting list. Quite horrible,
+ - -}
 fillVoid :: Level -> Level
-fillVoid m =
-    let neighbormap = makeNeighborList m
-        newBlock blocks = if all (`elem` [Void, Wall]) blocks then Void else head blocks
+fillVoid level =
+    let newBlock blocks = if all (`elem` [Void, Wall]) blocks then Void else head blocks
         in
-    amap newBlock neighbormap
+    amap newBlock $ makeAdjArr level
 
 
 offsetArr :: (Num a, Ix a) => Array (a, a) e -> (a, a) -> Array (a, a) e
@@ -101,19 +106,19 @@ growArr arr =
 
 shrinkArr arr =
     let (b1, b2) = bounds arr
-        (b1', b2') = (b1 |+| (1, 1), b2 |-| (1, 1))
+        bounds' = (b1 |+| (1, 1), b2 |-| (1, 1))
     in
-    array (b1', b2') [(i, arr ! i) | i <- range (b1', b2')]
+    array bounds' [(i, arr ! i) | i <- range bounds']
 
 
-makeNeighborList :: LevelArray Block -> LevelArray [Block]
-makeNeighborList map' =
-    let listMap = amap (:[]) map'
+makeAdjArr :: LevelArray Block -> LevelArray [Block]
+makeAdjArr level =
+    let listArr = amap (:[]) level
         offsets = [(y, x) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 && y/= 0]
-        offsetMaps = map (offsetArr listMap) offsets
-        combinedMap = shrinkArr $ foldr (\omap lmap -> accum (++) lmap (assocs omap)) (growArr listMap) offsetMaps
+        offsetLevels = map (offsetArr listArr) offsets
+        foldStep arr seed = accum (++) seed (assocs arr)
             in
-    combinedMap
+    shrinkArr $ foldr foldStep (growArr listArr) offsetLevels
 
 
 -- return a list of all coordinates for a given block type
