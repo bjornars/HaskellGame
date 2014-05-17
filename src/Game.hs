@@ -23,10 +23,12 @@ startGame draw getInput = do
 
 
 gameLoop :: Game () -> IO GAction -> Game ()
-gameLoop draw getAction world = do
-    draw world
-    action <- getAction
-    unless (action == Quit) $ tick action world >>= gameLoop draw getAction
+gameLoop draw getAction = go
+    where
+        go world = do
+            draw world
+            action <- getAction
+            unless (action == Quit) $ tick action world >>= go
 
 
 tick :: GAction -> Game World
