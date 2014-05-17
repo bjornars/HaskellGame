@@ -4,19 +4,19 @@ module Game
 
 import Control.Arrow
 import Control.Monad
-import Control.Lens
+import Control.Lens hiding (Level)
 import Data.Array.IArray
 import Data.List
 import Data.Ord
 
 import Types
-import GameMap
+import Level
 
 startGame :: Game () -> IO GAction -> IO ()
 startGame draw getInput = do
-    let gameMap = fillVoid $ forceMap $ loadMap mapBlock1
-        (newMap, hero, monsters) = extractActorsFromMap gameMap
-        world = GameState { _whero = hero, _wmap = newMap, _wmonsters = monsters}
+    let gameLevel = fillVoid $ forceLevel $ loadLevel level1
+        (newLevel, hero, monsters) = extractActorsFromLevel gameLevel
+        world = GameState { _whero = hero, _wmap = newLevel, _wmonsters = monsters}
 
     gameLoop draw getInput world
     return ()
@@ -54,18 +54,18 @@ validateAction world = case (world^.wmap) ! idx of
     where idx  = (world^.whero.hxpos, world^.whero.hypos)
 
 
-extractActorsFromMap :: Map -> (Map, Hero, [Monster])
-extractActorsFromMap map' = (monsterlessMap, makeHero heroes, makeMonsters monsters)
-    where (heroes, herolessMap) = splitOut HeroSpawn map'
-          (monsters, monsterlessMap) = splitOut MonsterSpawn herolessMap
+extractActorsFromLevel :: Level -> (Level, Hero, [Monster])
+extractActorsFromLevel map' = (monsterlessLevel, makeHero heroes, makeMonsters monsters)
+    where (heroes, herolessLevel) = splitOut HeroSpawn map'
+          (monsters, monsterlessLevel) = splitOut MonsterSpawn herolessLevel
           makeHero hs = uncurry Hero (fst.head $ hs) 20
           makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
 
 
-splitOut :: MapBlock -> Map -> ([((Integer, Integer), MapBlock)], Map)
-splitOut bType map' = (blocks, remainingMap)
+splitOut :: Block -> Level -> ([((Integer, Integer), Block)], Level)
+splitOut bType map' = (blocks, remainingLevel)
     where blocks = findBlocks bType map'
-          remainingMap =  map' // map (second (const Empty)) blocks
+          remainingLevel =  map' // map (second (const Empty)) blocks
 
 
 moveMonsters :: GameState -> GameState
@@ -75,7 +75,7 @@ moveMonsters world = wmonsters %~ map moveMonster' $ world
           moveMonster' = moveMonster m h
 
 
-moveMonster :: Map -> Hero -> Monster -> Monster
+moveMonster :: Level -> Hero -> Monster -> Monster
 moveMonster map' hero monster =
     let nfst = negate . fst
         nsnd = negate . snd

@@ -4,11 +4,11 @@ module Console
 , getAction
 ) where
 
-import Control.Lens
+import Control.Lens hiding (Level)
 import Data.Array.IArray
 import Graphics.Vty
 
-import GameMap
+import Level
 import Types
 
 draw :: Vty -> Game ()
@@ -21,14 +21,14 @@ draw vty world = do
                 x <- [0 .. w]
                 return (map' ! (y, x))
     update vty $ picture { pic_cursor = NoCursor }
-    where drawCell cell = string (blockAttr cell) [mapBlockToChr cell]
+    where drawCell cell = string (blockAttr cell) [blockToChr cell]
 
-addActors :: GameState -> Map
+addActors :: GameState -> Level
 addActors world = addMonsters (world^.wmonsters) $ addHero (world^.whero) $ world^.wmap
     where addHero hero = (// [(coords hero, HeroBlock)])
           addMonsters monsters  = (// zip (map coords monsters) (repeat MonsterBlock))
 
-blockAttr :: MapBlock -> Attr
+blockAttr :: Block -> Attr
 blockAttr HeroBlock    = with_fore_color def_attr bright_blue
 blockAttr MonsterBlock = with_fore_color def_attr bright_red
 blockAttr Treasure     = with_fore_color def_attr bright_yellow

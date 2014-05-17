@@ -2,7 +2,7 @@
 
 module Types where
 
-import Control.Lens
+import Control.Lens hiding (Level)
 import Data.Array.IArray
 
 -- | Prefix directions with 'D' to not conflict with Either (Left, Right)
@@ -18,10 +18,10 @@ data GAction
     | None
     deriving (Eq)
 
-type MapArray a = Array (Integer, Integer) a
-type Map = MapArray MapBlock
+type LevelArray a = Array (Integer, Integer) a
+type Level = LevelArray Block
 
-data MapBlock = HeroSpawn -- map blueprint only
+data Block = HeroSpawn -- map blueprint only
               | HeroBlock
               | Wall
               | Empty
@@ -36,7 +36,7 @@ type Game a = GameState -> IO a
 data GameState = GameState {
     _whero :: Hero,
     _wmonsters :: [Monster],
-    _wmap :: Map
+    _wmap :: Level
 } deriving (Show)
 
 type Coords = (Integer, Integer)
@@ -65,7 +65,7 @@ makeLenses ''Monster
 makeLenses ''GameState
 
 class Renderable a where
-    blockType :: a -> MapBlock
+    blockType :: a -> Block
     coords :: a -> Coords
 
 instance Renderable Hero where

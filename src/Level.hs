@@ -1,10 +1,10 @@
-module GameMap (
-    mapBlock1
+module Level (
+    level1
   , fillVoid
-  , loadMap
-  , forceMap
+  , loadLevel
+  , forceLevel
   , findBlocks
-  , mapBlockToChr
+  , blockToChr
 ) where
 
 
@@ -13,23 +13,23 @@ import Data.Array.IArray
 import Data.Maybe
 import Types
 
-mapBlockToChr :: MapBlock -> Char
-mapBlockToChr HeroBlock    = '@'
-mapBlockToChr Wall         = 'X'
-mapBlockToChr Empty        = '.'
-mapBlockToChr Void         = ' '
-mapBlockToChr MonsterBlock = '#'
-mapBlockToChr Treasure     = 'T'
+blockToChr :: Block -> Char
+blockToChr HeroBlock    = '@'
+blockToChr Wall         = 'X'
+blockToChr Empty        = '.'
+blockToChr Void         = ' '
+blockToChr MonsterBlock = '#'
+blockToChr Treasure     = 'T'
 
-mapBlockToChr MonsterSpawn = 'S'
-mapBlockToChr HeroSpawn    = '@'
+blockToChr MonsterSpawn = 'S'
+blockToChr HeroSpawn    = '@'
 
-chrToMapBlock :: Char -> Maybe MapBlock
-chrToMapBlock c = lookup c assocList
-    where assocList = map ((,) <$> mapBlockToChr <*> id) [minBound ..]
+chrToBlock :: Char -> Maybe Block
+chrToBlock c = lookup c assocList
+    where assocList = map ((,) <$> blockToChr <*> id) [minBound ..]
 
-mapBlock1 :: [String]
-mapBlock1 =
+level1 :: [String]
+level1 =
     ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ,"X........................................X"
     ,"X....................................@...X"
@@ -64,17 +64,17 @@ mapBlock1 =
     ]
 
 
-loadMap :: [String] -> Maybe Map
-loadMap input =
+loadLevel :: [String] -> Maybe Level
+loadLevel input =
     if null input || any null input then Nothing else
     let h = toInteger $ length input
         w = toInteger . length . head $ input in
-    listArray ((0, 0), (h - 1, w - 1)) <$> mapM chrToMapBlock (concat input)
+    listArray ((0, 0), (h - 1, w - 1)) <$> mapM chrToBlock (concat input)
 
-forceMap :: Maybe Map -> Map
-forceMap = fromMaybe (error "Error loading map :(")
+forceLevel :: Maybe Level -> Level
+forceLevel = fromMaybe (error "Error loading map :(")
 
-fillVoid :: Map -> Map
+fillVoid :: Level -> Level
 fillVoid m =
     let neighbormap = makeNeighborList m
         newBlock blocks = if all (`elem` [Void, Wall]) blocks then Void else head blocks
@@ -106,7 +106,7 @@ shrinkArr arr =
     array (b1', b2') [(i, arr ! i) | i <- range (b1', b2')]
 
 
-makeNeighborList :: MapArray MapBlock -> MapArray [MapBlock]
+makeNeighborList :: LevelArray Block -> LevelArray [Block]
 makeNeighborList map' =
     let listMap = amap (:[]) map'
         offsets = [(y, x) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 && y/= 0]
@@ -117,5 +117,5 @@ makeNeighborList map' =
 
 
 -- return a list of all coordinates for a given block type
-findBlocks :: MapBlock -> Map -> [((Integer, Integer), MapBlock)]
+findBlocks :: Block -> Level -> [((Integer, Integer), Block)]
 findBlocks block = filter ((== block).snd) . assocs
