@@ -28,19 +28,20 @@ gameLoop draw getAction = go
         go world = do
             draw world
             action <- getAction
-            unless (action == Quit) $ tick action world >>= go
+            when (action /= Quit) $
+                go $ tick action world
 
 
-tick :: GAction -> Game World
-tick action world = do
-    let world' = world & case action of
+tick :: GAction -> World -> World
+tick action world = let
+        world' = world & case action of
             Move DUp    -> (whero.hxpos) -~ 1
             Move DDown  -> (whero.hxpos) +~ 1
             Move DLeft  -> (whero.hypos) -~ 1
             Move DRight -> (whero.hypos) +~ 1
             _            -> id
-
-    return $ if validateAction world'
+        in
+    if validateAction world'
         then moveMonsters world'
         else world
 
