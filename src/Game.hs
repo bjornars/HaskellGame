@@ -62,7 +62,7 @@ extractActorsFromLevel level = (monsterlessLevel, makeHero heroes, makeMonsters 
           makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
 
 
-splitOut :: Block -> Level -> ([((Integer, Integer), Block)], Level)
+splitOut :: Block -> Level -> ([(Coords, Block)], Level)
 splitOut bType level = (blocks, remainingLevel)
     where blocks = findBlocks bType level
           remainingLevel =  level // map (second (const Empty)) blocks

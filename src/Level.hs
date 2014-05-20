@@ -122,5 +122,5 @@ makeAdjArr level =
 
 
 -- return a list of all coordinates for a given block type
-findBlocks :: Block -> Level -> [((Integer, Integer), Block)]
+findBlocks :: Block -> Level -> [(Coords, Block)]
 findBlocks block = filter ((== block).snd) . assocs

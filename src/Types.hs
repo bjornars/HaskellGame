@@ -18,7 +18,8 @@ data GAction
     | None
     deriving (Eq)
 
-type LevelArray a = Array (Integer, Integer) a
+type Coords = (Integer, Integer)
+type LevelArray a = Array Coords a
 type Level = LevelArray Block
 
 data Block = HeroSpawn -- map blueprint only
@@ -39,7 +40,6 @@ data GameState = GameState {
     _wmap :: Level
 } deriving (Show)
 
-type Coords = (Integer, Integer)
 
 data Hero = Hero {
     _hxpos :: Integer,
