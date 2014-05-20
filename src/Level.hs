@@ -9,6 +9,7 @@ module Level (
 
 
 import Control.Applicative
+import Control.Arrow ((&&&))
 import Data.Array.IArray
 import Data.Maybe
 import Types
@@ -26,7 +27,7 @@ blockToChr HeroSpawn    = '@'
 
 chrToBlock :: Char -> Maybe Block
 chrToBlock c = lookup c assocList
-    where assocList = map ((,) <$> blockToChr <*> id) [minBound ..]
+    where assocList = map (blockToChr &&& id) [minBound ..]
 
 level1 :: [String]
 level1 =

@@ -5,6 +5,7 @@ module Console
 ) where
 
 import Control.Lens hiding (Level)
+import Control.Arrow ((&&&))
 import Data.Array.IArray
 import Graphics.Vty
 
@@ -25,8 +26,8 @@ draw vty world = do
 
 addActors :: GameState -> Level
 addActors world = addMonsters (world^.wmonsters) $ addHero (world^.whero) $ world^.wmap
-    where addHero hero = (// [(coords hero, HeroBlock)])
-          addMonsters monsters  = (// zip (map coords monsters) (repeat MonsterBlock))
+    where addHero hero = (// [coords &&& blockType $ hero])
+          addMonsters monsters  = (// map (coords &&& blockType) monsters)
 
 blockAttr :: Block -> Attr
 blockAttr HeroBlock    = with_fore_color def_attr bright_blue
