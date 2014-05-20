@@ -13,13 +13,13 @@ import Types
 
 draw :: Vty -> Game ()
 draw vty world = do
-    let map' = amap drawCell . addActors $ world
-        (_, (h, w)) = bounds map'
+    let level = amap drawCell . addActors $ world
+        (_, (h, w)) = bounds level
         picture = pic_for_image . vert_cat $ do
             y <- [0 .. h]
             return . horiz_cat $ do
                 x <- [0 .. w]
-                return (map' ! (y, x))
+                return (level ! (y, x))
     update vty $ picture { pic_cursor = NoCursor }
     where drawCell cell = string (blockAttr cell) [blockToChr cell]
 

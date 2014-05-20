@@ -55,17 +55,17 @@ validateAction world = case (world^.wmap) ! idx of
 
 
 extractActorsFromLevel :: Level -> (Level, Hero, [Monster])
-extractActorsFromLevel map' = (monsterlessLevel, makeHero heroes, makeMonsters monsters)
-    where (heroes, herolessLevel) = splitOut HeroSpawn map'
+extractActorsFromLevel level = (monsterlessLevel, makeHero heroes, makeMonsters monsters)
+    where (heroes, herolessLevel) = splitOut HeroSpawn level
           (monsters, monsterlessLevel) = splitOut MonsterSpawn herolessLevel
           makeHero hs = uncurry Hero (fst.head $ hs) 20
           makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
 
 
 splitOut :: Block -> Level -> ([((Integer, Integer), Block)], Level)
-splitOut bType map' = (blocks, remainingLevel)
-    where blocks = findBlocks bType map'
-          remainingLevel =  map' // map (second (const Empty)) blocks
+splitOut bType level = (blocks, remainingLevel)
+    where blocks = findBlocks bType level
+          remainingLevel =  level // map (second (const Empty)) blocks
 
 
 moveMonsters :: GameState -> GameState
@@ -76,7 +76,7 @@ moveMonsters world = wmonsters %~ map moveMonster' $ world
 
 
 moveMonster :: Level -> Hero -> Monster -> Monster
-moveMonster map' hero monster =
+moveMonster level hero monster =
     let nfst = negate . fst
         nsnd = negate . snd
         vector = coords hero |-| coords monster
@@ -88,7 +88,7 @@ moveMonster map' hero monster =
         move = snd.head $ sortBy (comparing fst) directions
         (x, y) = move $ coords monster
     in
-        if map' ! (x,y) == Empty then
+        if level ! (x,y) == Empty then
             monster { _mxpos = x, _mypos = y }
         else
             monster
