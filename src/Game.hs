@@ -69,11 +69,30 @@ splitOut bType level = (blocks, remainingLevel)
 
 
 moveMonsters :: GameState -> GameState
-moveMonsters world = wmonsters %~ map moveMonster' $ world
-    where m = world^.wmap
-          h = world^.whero
-          moveMonster' = moveMonster m h
+moveMonsters world =
+    let monsters = world^.wmonsters
+        hero = world^.whero
+        level = (world^.wmap) // [coords &&& blockType $ hero]
+        (_, monsters') = moveAndAddMonsters level hero monsters in
+    set wmonsters monsters' world
 
+
+-- can this be written as a fold?
+moveAndAddMonsters :: Level -> Hero -> [Monster] -> (Level, [Monster])
+moveAndAddMonsters level _ [] = (level, [])
+moveAndAddMonsters level hero (m:ms) =
+    let (level', m') = moveAndAddMonster level hero m
+        (level'', ms') = moveAndAddMonsters level' hero ms in
+    (level'', m': ms')
+
+
+-- move a monsters according to 'AI', and then add it to our working map
+moveAndAddMonster :: Level -> Hero -> Monster -> (Level, Monster)
+moveAndAddMonster level hero monster =
+    let newMonster = moveMonster level hero monster
+        addMonster m l = l // [coords &&& blockType $ m]
+        in
+    (addMonster newMonster level, newMonster)
 
 moveMonster :: Level -> Hero -> Monster -> Monster
 moveMonster level hero monster =
