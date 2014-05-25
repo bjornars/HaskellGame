@@ -7,6 +7,8 @@ module Console
 import Control.Lens hiding (Level)
 import Control.Arrow ((&&&))
 import Data.Array.IArray
+import Data.Function (on)
+import Data.List (groupBy)
 import Graphics.Vty
 
 import Level
@@ -15,12 +17,9 @@ import Types
 draw :: Vty -> Game ()
 draw vty world = do
     let level = amap drawCell . addActors $ world
-        (_, (h, w)) = bounds level
-        picture = pic_for_image . vert_cat $ do
-            y <- [0 .. h]
-            return . horiz_cat $ do
-                x <- [0 .. w]
-                return (level ! (y, x))
+        cells = assocs level
+        rows =  (map.map) snd $ groupBy ((==) `on` fst.fst) cells
+        picture = pic_for_image . vert_cat $ map horiz_cat rows
     update vty $ picture { pic_cursor = NoCursor }
     where drawCell cell = string (blockAttr cell) [blockToChr cell]
 
