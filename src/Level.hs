@@ -1,76 +1,47 @@
-module Level (
-    level1
-  , fillVoid
+module Level
+  ( fillVoid
   , loadLevel
   , forceLevel
-  , findBlocks
-  , blockToChr
-) where
+  ) where
 
 
-import Control.Applicative
-import Control.Arrow ((&&&))
 import Data.Array.IArray
 import Data.Maybe
 import Types
 
-blockToChr :: Block -> Char
-blockToChr HeroBlock    = '@'
-blockToChr Wall         = 'X'
-blockToChr Empty        = '.'
-blockToChr Void         = ' '
-blockToChr MonsterBlock = '#'
-blockToChr Treasure     = 'T'
 
-blockToChr MonsterSpawn = 'S'
-blockToChr HeroSpawn    = '@'
-
-chrToBlock :: Char -> Maybe Block
-chrToBlock c = lookup c assocList
-    where assocList = map (blockToChr &&& id) [minBound ..]
-
-level1 :: [String]
-level1 =
-    ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....................................@...XXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.SSSSS...........XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.SSSSS...........XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXX...................XXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXX.........XXXX....................XXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX.................................XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX.................................XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX............T.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX..............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX............T.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX................SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX......XXXXX.....SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX......XXXXX.....SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX......XXXXX......................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
-    ,"X....XX.................................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
-    ,"X....XXXXXX.............................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
-    ,"X....XXXXXX.............................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
-    ,"X....XXXXXX.............................XXXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X...............................XXXXXXXXXXXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X...............................XXXXXXXXXXXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....XXXXXX.........XXXXX..............................................................XXXXX"
-    ,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    ]
+chrToBlock :: Char -> Block
+chrToBlock 'X' = Wall
+chrToBlock '.' = Empty
+chrToBlock _   = Void
 
 
-loadLevel :: [String] -> Maybe Level
-loadLevel input =
-    if null input || any null input then Nothing else
+data LevelBlock = HeroSpawn
+                | MonsterSpawn
+                | TreasureSpawn
+                deriving (Bounded, Enum, Eq, Show)
+
+
+loadLevel :: Monster m => [String] -> [(Char, Coords -> m)] -> (Level, Hero, [m])
+loadLevel input mMap =
+    let level = parseLevel chrToBlock input
+        chrLevel = parseLevel id input
+        hero = mkHero . head $ findBlocks '@' chrLevel
+        monsters = concat [map f $ findBlocks c chrLevel | (c, f) <- mMap]
+    in (level, hero, monsters)
+
+
+parseLevel :: (a -> b) -> [[a]] -> Array Coords b
+parseLevel fn input =
     let h = toInteger $ length input
         w = toInteger . length . head $ input in
-    listArray ((0, 0), (h - 1, w - 1)) <$> mapM chrToBlock (concat input)
+    listArray ((0, 0), (h - 1, w - 1)) $ map fn (concat input)
+
+
+-- return a list of all coordinates for a given block type
+findBlocks :: Eq a => a -> Array Coords a -> [Coords]
+findBlocks x = map fst . filter ((== x) . snd) . assocs
+
 
 forceLevel :: Maybe Level -> Level
 forceLevel = fromMaybe (error "Error loading map :(")
@@ -120,8 +91,3 @@ makeAdjArr level =
         foldStep arr seed = accum (++) seed (assocs arr)
             in
     shrinkArr $ foldr foldStep (growArr listArr) offsetLevels
-
-
--- return a list of all coordinates for a given block type
-findBlocks :: Block -> Level -> [(Coords, Block)]
-findBlocks block = filter ((== block).snd) . assocs

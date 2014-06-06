@@ -54,20 +54,6 @@ validateAction world = case (world^.wmap) ! idx of
     where idx  = (world^.whero.hxpos, world^.whero.hypos)
 
 
-extractActorsFromLevel :: Level -> (Level, Hero, [Monster])
-extractActorsFromLevel level = (monsterlessLevel, makeHero heroes, makeMonsters monsters)
-    where (heroes, herolessLevel) = splitOut HeroSpawn level
-          (monsters, monsterlessLevel) = splitOut MonsterSpawn herolessLevel
-          makeHero hs = uncurry Hero (fst.head $ hs) 20
-          makeMonsters = map (\pos -> uncurry Monster (fst pos) Monster1 5)
-
-
-splitOut :: Block -> Level -> ([(Coords, Block)], Level)
-splitOut bType level = (blocks, remainingLevel)
-    where blocks = findBlocks bType level
-          remainingLevel =  level // map (second (const Empty)) blocks
-
-
 moveMonsters :: GameState -> GameState
 moveMonsters world =
     let monsters = world^.wmonsters

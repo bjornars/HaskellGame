@@ -1,9 +1,10 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RankNTypes, TemplateHaskell #-}
 
 module Types where
 
 import Control.Lens hiding (Level)
 import Data.Array.IArray
+import Graphics.Vty
 
 -- | Prefix directions with 'D' to not conflict with Either (Left, Right)
 data Direction = DUp | DDown | DLeft | DRight
@@ -22,21 +23,31 @@ type Coords = (Integer, Integer)
 type LevelArray a = Array Coords a
 type Level = LevelArray Block
 
-data Block = HeroSpawn -- map blueprint only
-              | HeroBlock
-              | Wall
-              | Empty
-              | Void
-              | MonsterSpawn -- map blueprint only
-              | MonsterBlock -- map blueprint only
-              | Treasure
-              deriving (Bounded, Enum, Eq, Show)
 
-type Game a = GameState -> IO a
+data Undefined = Undefined
 
-data GameState = GameState {
+data MonsterState = Living | Dead
+                  deriving (Show)
+
+class Monster a where
+    mImage :: a -> Image
+    mHurt :: a -> a
+    mTick :: a -> a
+    mState :: a -> MonsterState
+    mPos :: a -> Coords
+
+
+data Block = Wall
+           | Empty
+           | Void
+           | Treasure
+           deriving (Bounded, Enum, Eq, Show)
+
+type Game a = Monster m => GameState m -> IO a
+
+data Monster m => GameState m = GameState {
     _whero :: Hero,
-    _wmonsters :: [Monster],
+    _wmonsters :: [m],
     _wmap :: Level
 } deriving (Show)
 
@@ -47,35 +58,11 @@ data Hero = Hero {
     _hhealth :: Integer
 } deriving (Show)
 
-data Monster = Monster {
-    _mxpos :: Integer,
-    _mypos :: Integer,
-    _mtype :: MonsterType,
-    _mhealth :: Integer
-} deriving (Show)
-
-data MonsterType
-    = Monster1
-     | Monster2
-     | Monster3
-     deriving (Show)
+mkHero :: Coords -> Hero
+mkHero (y, x) = Hero x y 100
 
 makeLenses ''Hero
-makeLenses ''Monster
 makeLenses ''GameState
-
-class Renderable a where
-    blockType :: a -> Block
-    coords :: a -> Coords
-
-instance Renderable Hero where
-    blockType _ = HeroBlock
-    coords hero = (hero^.hxpos, hero^.hypos)
-
-instance Renderable Monster where
-    blockType _ = MonsterBlock
-    coords monster = (monster^.mxpos, monster^.mypos)
-
 
 (|-|), (|+|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 (x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
