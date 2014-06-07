@@ -65,7 +65,7 @@ offsetArr arr offset =
     array (b1 |+| offset, b2 |+| offset) [(i |+| offset, arr ! i) | i <- range (b1, b2)]
 
 
-growArr, shrinkArr :: (Num a, Ix a) => Array (a, a) [e] -> Array (a, a) [e]
+growArr :: (Num a, Ix a) => Array (a, a) [e] -> Array (a, a) [e]
 growArr arr =
     let (b1, b2) = bounds arr
         (b1', b2') = (b1 |-| (1, 1), b2 |+| (1, 1))
@@ -76,6 +76,7 @@ growArr arr =
         [(i, arr ! i) | i <- range (b1, b2)]
 
 
+shrinkArr :: (Num a, Ix a) => Array (a, a) [e] -> Array (a, a) [e]
 shrinkArr arr =
     let (b1, b2) = bounds arr
         bounds' = (b1 |+| (1, 1), b2 |-| (1, 1))
