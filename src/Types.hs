@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE ExistentialQuantification, RankNTypes, TemplateHaskell #-}
 
 module Types where
 
@@ -29,12 +29,23 @@ data Undefined = Undefined
 data MonsterState = Living | Dead
                   deriving (Show)
 
+type Monsters = [MonsterW]
+data MonsterW = forall a . Monster a => MkMonster a
+
 class Monster a where
     mImage :: a -> Image
     mHurt :: a -> a
     mTick :: a -> a
     mState :: a -> MonsterState
     mPos :: a -> Coords
+
+
+instance Monster MonsterW where
+    mImage (MkMonster m) = mImage m
+    mHurt (MkMonster m) = MkMonster $ mHurt m
+    mTick (MkMonster m) = MkMonster $ mTick m
+    mState (MkMonster m) = mState m
+    mPos (MkMonster m) = mPos m
 
 
 data Block = Wall

@@ -22,12 +22,12 @@ data LevelBlock = HeroSpawn
                 deriving (Bounded, Enum, Eq, Show)
 
 
-loadLevel :: Monster m => [String] -> [(Char, Coords -> m)] -> (Level, Hero, [m])
+loadLevel :: Monster m => [String] -> [(Char, Coords -> m)] -> (Level, Hero, Monsters)
 loadLevel input mMap =
     let level = parseLevel chrToBlock input
         chrLevel = parseLevel id input
         hero = mkHero . head $ findBlocks '@' chrLevel
-        monsters = concat [map f $ findBlocks c chrLevel | (c, f) <- mMap]
+        monsters = concat [map (MkMonster . f) $ findBlocks c chrLevel | (c, f) <- mMap]
     in (level, hero, monsters)
 
 

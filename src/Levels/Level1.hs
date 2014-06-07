@@ -41,5 +41,5 @@ bluePrint =
     ]
 
 
--- level :: Monster m => (Level, Hero, [m])
+level :: (Level, Hero, Monsters)
 level = loadLevel bluePrint [('S', mkZombie)]
