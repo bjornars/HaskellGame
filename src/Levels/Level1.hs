@@ -5,8 +5,8 @@ import Types
 import Actor.Zombie
 
 
-bluePrint :: [String]
-bluePrint =
+blueprint :: [String]
+blueprint =
     ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
     ,"X....................................@...XXXXXXXXXXXXXXX...............................XXXXX"
@@ -42,4 +42,4 @@ bluePrint =
 
 
 level :: (Level, Hero, Monsters)
-level = loadLevel bluePrint [('S', mkZombie)]
+level = loadLevel blueprint [('S', mkZombie)]

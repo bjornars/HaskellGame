@@ -10,16 +10,13 @@ import Data.List
 import Data.Ord
 
 import Types
-import Level
+import qualified Levels.Level1 as L1
 
 startGame :: Game () -> IO GAction -> IO ()
-startGame draw getInput = do
-    let gameLevel = fillVoid $ forceLevel $ loadLevel level1
-        (newLevel, hero, monsters) = extractActorsFromLevel gameLevel
-        world = GameState { _whero = hero, _wmap = newLevel, _wmonsters = monsters}
-
-    gameLoop draw getInput world
-    return ()
+startGame draw getInput =
+    let (level, hero, monsters) = L1.level
+        world = GameState { _whero = hero, _wmap = level, _wmonsters = monsters }
+    in gameLoop draw getInput world
 
 
 gameLoop :: Game () -> IO GAction -> Game ()
