@@ -33,7 +33,7 @@ startGame draw getInput = uncurry go L1.level
 
             (GetUserAction :>>= next) -> do
                 action <- getInput
-                return . Just . (,) level $ actor { actorProg = next action }
+                return $ Just (level, actor { actorProg = next action })
 
             (GetActorPosition :>>= next) ->
                 return $ Just (level, actor { actorProg = next $ actorPos actor })
