@@ -41,7 +41,7 @@ startGame draw getInput = uncurry go L1.level
                 let old = actorPos actor
                     img = actorImage actor
                     level' = level // [(old, Empty), (new, ActorBlock img)]
-                    actor' = actor { actorPos = new, actorProg = next () }
+                    nextActor = actor { actorProg = next () }
                 in case level ! new of
-                    Empty -> return $ Just (level', actor')
-                    _     -> return $ Just (level, actor)
+                    Empty -> return $ Just (level', nextActor { actorPos = new })
+                    _     -> return $ Just (level, nextActor)
