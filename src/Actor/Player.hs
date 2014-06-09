@@ -14,12 +14,12 @@ player initPos = Actor playerImg initPos prog
     prog = do
         action <- getUserAction
         case action of
-            Quit        -> return ()
-            Move dir    -> do
+            Quit     -> return ()
+            Move dir -> do
                 pos <- getActorPosition
                 moveActor $ pos |+| dyx dir
                 prog
-            _           -> prog
+            _ -> prog
     dyx DUp    = (-1,  0)
     dyx DDown  = ( 1,  0)
     dyx DLeft  = ( 0, -1)
