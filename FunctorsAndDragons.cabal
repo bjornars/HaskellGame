@@ -20,6 +20,5 @@ executable FunctorsAndDragons
   -- other-modules:       
   build-depends:       array,
                        base ==4.6.*,
-                       lens,
                        operational,
                        vty

@@ -2,6 +2,8 @@ module Levels.Level1 (level) where
 
 import Level
 import Types
+import Actor.Player
+import Actor.Treasure
 import Actor.Zombie
 
 
@@ -41,5 +43,5 @@ blueprint =
     ]
 
 
-level :: (Level, Hero, Monsters)
-level = loadLevel blueprint [('Z', mkZombie)]
+level :: (Level, [Actor ()])
+level = loadLevel blueprint [('@', player), ('T', treasure), ('Z', zombie)]

@@ -1,8 +1,8 @@
-{-# LANGUAGE ExistentialQuantification, RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE GADTs #-}
 
 module Types where
 
-import Control.Lens hiding (Level)
+import Control.Monad.Operational
 import Data.Array.IArray
 import Graphics.Vty
 
@@ -24,56 +24,51 @@ type LevelArray a = Array Coords a
 type Level = LevelArray Block
 
 
-data Undefined = Undefined
-
-data MonsterState = Living | Dead
-                  deriving (Show)
-
-type Monsters = [MonsterW]
-data MonsterW = forall a . Monster a => MkMonster a
-
-class Monster a where
-    mImage :: a -> Image
-    mHurt :: a -> a
-    mTick :: a -> a
-    mState :: a -> MonsterState
-    mPos :: a -> Coords
+{- GADT of all actor operations. Use the singleton functions
+  for executing operations within the actor programs. -}
+data ActorOp a where
+    NoOp :: ActorOp ()
+    GetActorPosition :: ActorOp Coords
+    GetUserAction :: ActorOp GAction
+    MoveActor :: Coords -> ActorOp ()
+    ReadMap :: ActorOp Level
 
 
-instance Monster MonsterW where
-    mImage (MkMonster m) = mImage m
-    mHurt (MkMonster m) = MkMonster $ mHurt m
-    mTick (MkMonster m) = MkMonster $ mTick m
-    mState (MkMonster m) = mState m
-    mPos (MkMonster m) = mPos m
+data Actor a = Actor
+             { actorImage :: Image
+             , actorPos :: Coords
+             , actorProg :: Program ActorOp a
+             }
+
+
+type ActorP a = Program ActorOp a
+
+
+noOp :: ActorP ()
+noOp = singleton NoOp
+
+
+getActorPosition :: ActorP Coords
+getActorPosition = singleton GetActorPosition
+
+
+getUserAction :: ActorP GAction
+getUserAction = singleton GetUserAction
+
+
+moveActor :: Coords -> ActorP ()
+moveActor = singleton . MoveActor
+
+
+readMap :: ActorP Level
+readMap = singleton ReadMap
 
 
 data Block = Wall
            | Empty
            | Void
-           | Treasure
-           deriving (Bounded, Enum, Eq, Show)
-
-type Game a = Monster m => GameState m -> IO a
-
-data Monster m => GameState m = GameState {
-    _whero :: Hero,
-    _wmonsters :: [m],
-    _wmap :: Level
-} deriving (Show)
-
-
-data Hero = Hero {
-    _hxpos :: Integer,
-    _hypos :: Integer,
-    _hhealth :: Integer
-} deriving (Show)
-
-mkHero :: Coords -> Hero
-mkHero (y, x) = Hero x y 100
-
-makeLenses ''Hero
-makeLenses ''GameState
+           | ActorBlock Image
+           deriving (Eq, Show)
 
 (|-|), (|+|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 (x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)

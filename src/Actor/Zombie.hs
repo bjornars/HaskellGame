@@ -1,23 +1,13 @@
-module Actor.Zombie (Zombie, mkZombie) where
+module Actor.Zombie where
 
+import Control.Monad
 import Graphics.Vty
 import Types
 
 
-data Zombie = Zombie
-            { zHealth :: Int
-            , zPos :: Coords
-            , zState :: MonsterState
-            } deriving (Show)
+zombieImg :: Image
+zombieImg = string (with_fore_color def_attr bright_red) "X"
 
 
-instance Monster Zombie where
-    mImage = undefined
-    mHurt z = z
-    mTick z = z
-    mState = zState
-    mPos = zPos
-
-
-mkZombie :: Coords -> Zombie
-mkZombie p = Zombie 5 p Living
+zombie :: Coords -> Actor ()
+zombie pos = Actor zombieImg pos $ forever noOp

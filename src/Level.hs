@@ -1,34 +1,26 @@
 module Level
   ( fillVoid
   , loadLevel
-  , forceLevel
   ) where
 
 
+import Control.Arrow hiding (arr)
 import Data.Array.IArray
-import Data.Maybe
 import Types
 
 
 chrToBlock :: Char -> Block
 chrToBlock 'X' = Wall
-chrToBlock '.' = Empty
-chrToBlock _   = Void
+chrToBlock _   = Empty
 
 
-data LevelBlock = HeroSpawn
-                | MonsterSpawn
-                | TreasureSpawn
-                deriving (Bounded, Enum, Eq, Show)
-
-
-loadLevel :: Monster m => [String] -> [(Char, Coords -> m)] -> (Level, Hero, Monsters)
-loadLevel input mMap =
-    let level = parseLevel chrToBlock input
+loadLevel :: [String] -> [(Char, Coords -> Actor ())] -> (Level, [Actor ()])
+loadLevel input actorMap =
+    let level = fillVoid $ parseLevel chrToBlock input
         chrLevel = parseLevel id input
-        hero = mkHero . head $ findBlocks '@' chrLevel
-        monsters = concat [map (MkMonster . f) $ findBlocks c chrLevel | (c, f) <- mMap]
-    in (level, hero, monsters)
+        actors = concat [map f $ findBlocks c chrLevel | (c, f) <- actorMap]
+        level' = level // map (actorPos &&& ActorBlock . actorImage) actors
+    in (level', actors)
 
 
 parseLevel :: (a -> b) -> [[a]] -> Array Coords b
@@ -41,10 +33,6 @@ parseLevel fn input =
 -- return a list of all coordinates for a given block type
 findBlocks :: Eq a => a -> Array Coords a -> [Coords]
 findBlocks x = map fst . filter ((== x) . snd) . assocs
-
-
-forceLevel :: Maybe Level -> Level
-forceLevel = fromMaybe (error "Error loading map :(")
 
 
 {- Find all squares that are surrounded by Void or Wall. and convert them to Voids.
