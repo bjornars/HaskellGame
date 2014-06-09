@@ -12,8 +12,8 @@ blueprint =
     ,"X....................................@...XXXXXXXXXXXXXXX...............................XXXXX"
     ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
     ,"X........................................XXXXXXXXXXXXXXX...............................XXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.SSSSS...........XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.SSSSS...........XXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.ZZZZZ...........XXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.ZZZZZ...........XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXXXXXXXXXXXXXXX...................XXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXX.........XXXX....................XXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
@@ -24,9 +24,9 @@ blueprint =
     ,"X....XX............T.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XX..............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XX............T.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX................SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX......XXXXX.....SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XX......XXXXX.....SSSS.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XX................ZZZZ.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XX......XXXXX.....ZZZZ.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XX......XXXXX.....ZZZZ.............XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XX......XXXXX......................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
     ,"X....XX.................................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
     ,"X....XXXXXX.............................XXXXXXXXXXXXXXXXXXXXXX.........................XXXXX"
@@ -42,4 +42,4 @@ blueprint =
 
 
 level :: (Level, Hero, Monsters)
-level = loadLevel blueprint [('S', mkZombie)]
+level = loadLevel blueprint [('Z', mkZombie)]
