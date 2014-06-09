@@ -13,7 +13,6 @@ startGame draw getInput = uncurry go L1.level
     -- Main loop
     go _ []           = return ()
     go level (actor : xs) = do
-        draw level
         cont <- evalActor level actor
         case cont of
             Nothing               -> return ()
@@ -31,6 +30,7 @@ startGame draw getInput = uncurry go L1.level
                 return $ Just (level, actor { actorProg = next level })
 
             (GetUserAction :>>= next) -> do
+                draw level
                 action <- getInput
                 return $ Just (level, actor { actorProg = next action })
 
