@@ -7,7 +7,6 @@ import Data.Array.IArray
 import Types
 import qualified Levels.Level1 as L1
 
-
 startGame :: (Level -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput = uncurry go L1.level
     where
@@ -45,4 +44,4 @@ startGame draw getInput = uncurry go L1.level
                     actor' = actor { actorPos = new, actorProg = next () }
                 in case level ! new of
                     Empty -> return $ Just (level', actor')
-                    _     -> evalActor level actor
+                    _     -> return $ Just (level, actor)

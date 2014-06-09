@@ -1,6 +1,5 @@
 module Actor.Zombie (zombie) where
 
-import Control.Monad
 import Graphics.Vty
 import Types
 
@@ -10,4 +9,9 @@ zombieImg = string (with_fore_color def_attr bright_red) "Z"
 
 
 zombie :: Coords -> Actor ()
-zombie initPos = Actor zombieImg initPos $ forever noOp
+zombie initPos = Actor zombieImg initPos prog
+    where
+    prog = do
+        pos <- getActorPosition
+        moveActor $ pos |+| (1, 0)
+        prog
