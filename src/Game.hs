@@ -53,7 +53,7 @@ startGame draw getInput = uncurry go L1.level []
 
             (MoveActor new :>>= next) ->
                 let nextActor = actor { actorProg = next () }
-                in case level ! new of
+                in case addActors actors level ! new of
                     Empty -> evalActor nextActor { actorPos = new }
                     _     -> evalActor nextActor
 
