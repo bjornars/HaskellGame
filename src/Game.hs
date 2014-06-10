@@ -17,14 +17,15 @@ startGame draw getInput = uncurry go L1.level []
     go level []           xs  = go level (reverse xs) []
     go level (actor : xs) xs' = do
         when (null xs') $ draw level
-        cont <- evalActor level actor
+        cont <- eval (actor : xs ++ xs') level actor
         case cont of
             Nothing               -> return ()
             Just (level', actor') -> go level' xs (actor' : xs')
 
     -- Handle actor actions
-    evalActor level actor =
-        case view $ actorProg actor of
+    eval _ = evalActor
+        where
+        evalActor level actor = case view $ actorProg actor of
             (NextTick :>>= next) ->
             -- this actor is done, move on to next actor
                 return $ Just (level, actor { actorProg = next () })
