@@ -75,7 +75,7 @@ shrinkArr arr =
 makeAdjArr :: LevelArray Block -> LevelArray [Block]
 makeAdjArr level =
     let listArr = amap (:[]) level
-        offsets = [(y, x) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 && y/= 0]
+        offsets = [(y, x) | x <- [-1, 0, 1], y <- [-1, 0, 1], x /= 0 || y/= 0]
         offsetLevels = map (offsetArr listArr) offsets
         foldStep arr seed = accum (++) seed (assocs arr)
             in
