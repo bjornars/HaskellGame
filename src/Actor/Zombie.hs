@@ -1,6 +1,5 @@
 module Actor.Zombie (zombie) where
 
-import Control.Applicative
 import Graphics.Vty
 import Types
 
@@ -13,8 +12,8 @@ zombie :: Coords -> Actor ()
 zombie initPos = Actor zombieImg initPos prog
     where
     prog = do
-        let rand = getRandom (-1, 1)
         pos <- getActorPosition
-        dyx <- (,) <$> rand <*> rand
+        direction <- getRandom (0, 3)
+        let dyx = [(-1, 0), (1, 0), (0, 1), (0, -1)] !! direction
         moveActor $ pos |+| dyx
         nextTick >> prog
