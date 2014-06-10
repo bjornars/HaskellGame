@@ -1,4 +1,4 @@
-module Actor.Treasure where
+module Actor.Treasure (treasure) where
 
 import Control.Monad
 import Graphics.Vty
