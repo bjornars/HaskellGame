@@ -27,7 +27,7 @@ type Level = LevelArray Block
 {- GADT of all actor operations. Use the singleton functions
   for executing operations within the actor programs. -}
 data ActorOp a where
-    NoOp :: ActorOp ()
+    NextTick :: ActorOp ()
     GetActorPosition :: ActorOp Coords
     GetUserAction :: ActorOp GAction
     MoveActor :: Coords -> ActorOp ()
@@ -44,8 +44,8 @@ data Actor a = Actor
 type ActorP a = Program ActorOp a
 
 
-noOp :: ActorP ()
-noOp = singleton NoOp
+nextTick :: ActorP ()
+nextTick = singleton NextTick
 
 
 getActorPosition :: ActorP Coords

@@ -24,20 +24,21 @@ startGame draw getInput = uncurry go L1.level []
     -- Handle actor actions
     evalActor level actor =
         case view $ actorProg actor of
-            (Return _) -> return Nothing
-
-            (NoOp :>>= next) ->
+            (NextTick :>>= next) ->
+            -- this actor is done, move on to next actor
                 return $ Just (level, actor { actorProg = next () })
 
+            (Return _) -> return Nothing
+
             (ReadMap :>>= next) ->
-                return $ Just (level, actor { actorProg = next level })
+                evalActor level actor { actorProg = next level }
 
             (GetUserAction :>>= next) -> do
                 action <- getInput
-                return $ Just (level, actor { actorProg = next action })
+                evalActor level actor { actorProg = next action }
 
             (GetActorPosition :>>= next) ->
-                return $ Just (level, actor { actorProg = next $ actorPos actor })
+                evalActor level actor { actorProg = next $ actorPos actor }
 
             (MoveActor new :>>= next) ->
                 let old = actorPos actor
@@ -45,5 +46,5 @@ startGame draw getInput = uncurry go L1.level []
                     level' = level // [(old, Empty), (new, ActorBlock img)]
                     nextActor = actor { actorProg = next () }
                 in case level ! new of
-                    Empty -> return $ Just (level', nextActor { actorPos = new })
-                    _     -> return $ Just (level, nextActor)
+                    Empty -> evalActor level' nextActor { actorPos = new }
+                    _     -> evalActor level nextActor

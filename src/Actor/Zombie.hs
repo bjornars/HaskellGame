@@ -14,4 +14,4 @@ zombie initPos = Actor zombieImg initPos prog
     prog = do
         pos <- getActorPosition
         moveActor $ pos |+| (1, 0)
-        prog
+        nextTick >> prog

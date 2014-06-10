@@ -18,7 +18,7 @@ player initPos = Actor playerImg initPos prog
             Move dir -> do
                 pos <- getActorPosition
                 moveActor $ pos |+| dyx dir
-                prog
+                nextTick >> prog
             _ -> prog
     dyx DUp    = (-1,  0)
     dyx DDown  = ( 1,  0)

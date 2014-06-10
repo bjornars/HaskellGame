@@ -10,4 +10,4 @@ treasureImg = string (with_fore_color def_attr bright_yellow) "T"
 
 
 treasure :: Coords -> Actor ()
-treasure pos = Actor treasureImg pos $ forever noOp
+treasure pos = Actor treasureImg pos $ forever nextTick
