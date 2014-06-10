@@ -4,7 +4,6 @@ module Console
 , getAction
 ) where
 
-import Data.ByteString.UTF8 (fromString)
 import Data.Array.IArray
 import Data.Function (on)
 import Data.List (groupBy)
@@ -25,7 +24,7 @@ draw vty level = do
 drawCell :: Block -> Image
 drawCell Empty            = string (with_fore_color def_attr bright_black) "."
 drawCell Void             = string def_attr " "
-drawCell Wall             = utf8_bytestring (with_fore_color def_attr bright_black) $ fromString "░"
+drawCell Wall             = string (with_fore_color def_attr bright_black) "X"
 drawCell (ActorBlock img) = img
 
 
