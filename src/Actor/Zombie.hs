@@ -13,7 +13,8 @@ zombie :: Coords -> Actor ()
 zombie initPos = Actor zombieImg initPos prog
     where
     prog = do
+        let rand = getRandom (-1, 1)
         pos <- getActorPosition
-        dyx <- (,) <$> getRandom (-1, 1) <*> getRandom (-1, 1)
+        dyx <- (,) <$> rand <*> rand
         moveActor $ pos |+| dyx
         nextTick >> prog
