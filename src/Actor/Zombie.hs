@@ -1,5 +1,6 @@
 module Actor.Zombie (zombie) where
 
+import Control.Applicative
 import Graphics.Vty
 import Types
 
@@ -13,5 +14,6 @@ zombie initPos = Actor zombieImg initPos prog
     where
     prog = do
         pos <- getActorPosition
-        moveActor $ pos |+| (1, 0)
+        dyx <- (,) <$> getRandom (-1, 1) <*> getRandom (-1, 1)
+        moveActor $ pos |+| dyx
         nextTick >> prog

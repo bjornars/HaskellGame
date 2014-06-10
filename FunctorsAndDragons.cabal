@@ -21,4 +21,5 @@ executable FunctorsAndDragons
   build-depends:       array,
                        base ==4.6.*,
                        operational,
+                       random,
                        vty

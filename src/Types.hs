@@ -5,6 +5,7 @@ module Types where
 import Control.Monad.Operational
 import Data.Array.IArray
 import Graphics.Vty
+import System.Random
 
 -- | Prefix directions with 'D' to not conflict with Either (Left, Right)
 data Direction = DUp | DDown | DLeft | DRight
@@ -27,6 +28,7 @@ type Level = LevelArray Block
 {- GADT of all actor operations. Use the singleton functions
   for executing operations within the actor programs. -}
 data ActorOp a where
+    GetRandom :: Random a => (a, a) -> ActorOp a
     NextTick :: ActorOp ()
     GetActorPosition :: ActorOp Coords
     GetUserAction :: ActorOp GAction
@@ -42,6 +44,10 @@ data Actor a = Actor
 
 
 type ActorP a = Program ActorOp a
+
+
+getRandom :: Random a => (a, a) -> ActorP a
+getRandom = singleton . GetRandom
 
 
 nextTick :: ActorP ()

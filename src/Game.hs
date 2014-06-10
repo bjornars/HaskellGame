@@ -5,6 +5,7 @@ module Game (startGame) where
 import Control.Monad
 import Control.Monad.Operational
 import Data.Array.IArray
+import System.Random
 import Types
 import qualified Levels.Level1 as L1
 
@@ -29,6 +30,10 @@ startGame draw getInput = uncurry go L1.level []
                 return $ Just (level, actor { actorProg = next () })
 
             (Return _) -> return Nothing
+
+            (GetRandom range :>>= next) -> do
+                randVal <- randomRIO range
+                evalActor level actor { actorProg = next randVal }
 
             (ReadMap :>>= next) ->
                 evalActor level actor { actorProg = next level }
