@@ -2,21 +2,24 @@
 
 module Game (startGame) where
 
+import Control.Monad
 import Control.Monad.Operational
 import Data.Array.IArray
 import Types
 import qualified Levels.Level1 as L1
 
 startGame :: (Level -> IO ()) -> IO GAction -> IO ()
-startGame draw getInput = uncurry go L1.level
+startGame draw getInput = uncurry go L1.level []
     where
     -- Main loop
-    go _ []           = return ()
-    go level (actor : xs) = do
+    go _     []           []  = return ()
+    go level []           xs  = go level (reverse xs) []
+    go level (actor : xs) xs' = do
+        when (null xs') $ draw level
         cont <- evalActor level actor
         case cont of
             Nothing               -> return ()
-            Just (level', actor') -> go level' (xs ++ [actor'])
+            Just (level', actor') -> go level' xs (actor' : xs')
 
     -- Handle actor actions
     evalActor level actor =
@@ -30,7 +33,6 @@ startGame draw getInput = uncurry go L1.level
                 return $ Just (level, actor { actorProg = next level })
 
             (GetUserAction :>>= next) -> do
-                draw level
                 action <- getInput
                 return $ Just (level, actor { actorProg = next action })
 
