@@ -4,7 +4,6 @@ module Level
   ) where
 
 
-import Control.Arrow hiding (arr)
 import Data.Array.IArray
 import Types
 
@@ -19,8 +18,7 @@ loadLevel input actorMap =
     let level = fillVoid $ parseLevel chrToBlock input
         chrLevel = parseLevel id input
         actors = concat [map f $ findBlocks c chrLevel | (c, f) <- actorMap]
-        level' = level // map (actorPos &&& ActorBlock . actorImage) actors
-    in (level', actors)
+    in (level, actors)
 
 
 parseLevel :: (a -> b) -> [[a]] -> Array Coords b

@@ -2,6 +2,7 @@
 
 module Game (startGame) where
 
+import Control.Arrow ((&&&))
 import Control.Monad
 import Control.Monad.Operational
 import Data.Array.IArray hiding (range)
@@ -16,16 +17,17 @@ startGame draw getInput = uncurry go L1.level []
     go _     []           []  = return ()
     go level []           xs  = go level (reverse xs) []
     go level (actor : xs) xs' = do
-        when (null xs') $ draw level
-        cont <- eval (actor : xs ++ xs') level actor
+        let actors = actor : xs ++ xs'
+        when (null xs') $ draw $ addActors actors level
+        cont <- eval actors level actor
         case cont of
             Nothing               -> return ()
             Just (level', actor') -> go level' xs (actor' : xs')
 
     -- Handle actor actions
-    eval _ = evalActor
+    eval actors level = evalActor
         where
-        evalActor level actor = case view $ actorProg actor of
+        evalActor actor = case view $ actorProg actor of
             (NextTick :>>= next) ->
             -- this actor is done, move on to next actor
                 return $ Just (level, actor { actorProg = next () })
@@ -34,23 +36,27 @@ startGame draw getInput = uncurry go L1.level []
 
             (GetRandom range :>>= next) -> do
                 randVal <- randomRIO range
-                evalActor level actor { actorProg = next randVal }
+                evalActor actor { actorProg = next randVal }
 
             (ReadMap :>>= next) ->
-                evalActor level actor { actorProg = next level }
+                evalActor actor { actorProg = next level }
+
+            (ReadMapWithActors :>>= next) ->
+                evalActor actor { actorProg = next $ addActors actors level }
 
             (GetUserAction :>>= next) -> do
                 action <- getInput
-                evalActor level actor { actorProg = next action }
+                evalActor actor { actorProg = next action }
 
             (GetActorPosition :>>= next) ->
-                evalActor level actor { actorProg = next $ actorPos actor }
+                evalActor actor { actorProg = next $ actorPos actor }
 
             (MoveActor new :>>= next) ->
-                let old = actorPos actor
-                    img = actorImage actor
-                    level' = level // [(old, Empty), (new, ActorBlock img)]
-                    nextActor = actor { actorProg = next () }
+                let nextActor = actor { actorProg = next () }
                 in case level ! new of
-                    Empty -> evalActor level' nextActor { actorPos = new }
-                    _     -> evalActor level nextActor
+                    Empty -> evalActor nextActor { actorPos = new }
+                    _     -> evalActor nextActor
+
+
+addActors :: [Actor ()] -> Level -> Level
+addActors actors level = level // map (actorPos &&& ActorBlock . actorImage) actors

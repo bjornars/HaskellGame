@@ -34,6 +34,7 @@ data ActorOp a where
     GetUserAction :: ActorOp GAction
     MoveActor :: Coords -> ActorOp ()
     ReadMap :: ActorOp Level
+    ReadMapWithActors :: ActorOp Level
 
 
 data Actor a = Actor
@@ -68,6 +69,10 @@ moveActor = singleton . MoveActor
 
 readMap :: ActorP Level
 readMap = singleton ReadMap
+
+
+readMapWithActors :: ActorP Level
+readMapWithActors = singleton ReadMapWithActors
 
 
 data Block = Wall
