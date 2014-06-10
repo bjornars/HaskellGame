@@ -4,8 +4,8 @@ module Game (startGame) where
 
 import Control.Monad
 import Control.Monad.Operational
-import Data.Array.IArray
-import System.Random
+import Data.Array.IArray hiding (range)
+import System.Random (randomRIO)
 import Types
 import qualified Levels.Level1 as L1
 
