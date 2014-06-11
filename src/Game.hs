@@ -12,17 +12,16 @@ import qualified Levels.Level1 as L1
 startGame :: (Level -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput =
     let (level, actors) = L1.level in
-    go level (drawActor:actors) []
+    go level (drawActor:actors)
     where
     -- Main loop
-    go _     []           []  = return ()
-    go level []           xs  = go level (reverse xs) []
-    go level (actor : xs) xs' = do
-        let actors = actor : xs ++ xs'
+    go _     [] = return ()
+    go level (actor : xs) = do
+        let actors = actor : xs
         cont <- eval actors level actor
         case cont of
             Nothing               -> return ()
-            Just (level', actor') -> go level' xs (actor' : xs')
+            Just (level', actor') -> go level' $ xs ++ [actor']
 
     -- Handle actor actions
     eval actors level = evalActor
