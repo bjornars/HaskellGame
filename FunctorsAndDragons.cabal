@@ -22,4 +22,4 @@ executable FunctorsAndDragons
                        base ==4.6.*,
                        operational,
                        random,
-                       vty
+                       vty ==4.*
