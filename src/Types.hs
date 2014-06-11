@@ -80,6 +80,11 @@ readMapWithActors :: ActorP Level
 readMapWithActors = singleton ReadMapWithActors
 
 
+drawActor :: Actor ()
+drawActor = Actor (string (with_fore_color def_attr bright_red) " ")  (0, 0) prog
+    where prog = drawMap >> nextTick >> prog
+
+
 data Block = Wall
            | Empty
            | Void

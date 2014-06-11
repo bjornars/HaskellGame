@@ -10,7 +10,9 @@ import Types
 import qualified Levels.Level1 as L1
 
 startGame :: (Level -> IO ()) -> IO GAction -> IO ()
-startGame draw getInput = uncurry go L1.level []
+startGame draw getInput =
+    let (level, actors) = L1.level in
+    go level (drawActor:actors) []
     where
     -- Main loop
     go _     []           []  = return ()
