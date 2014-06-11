@@ -3,7 +3,6 @@
 module Game (startGame) where
 
 import Control.Arrow ((&&&))
-import Control.Monad
 import Control.Monad.Operational
 import Data.Array.IArray hiding (range)
 import System.Random (randomRIO)
@@ -18,7 +17,6 @@ startGame draw getInput = uncurry go L1.level []
     go level []           xs  = go level (reverse xs) []
     go level (actor : xs) xs' = do
         let actors = actor : xs ++ xs'
-        when (null xs') $ draw $ addActors actors level
         cont <- eval actors level actor
         case cont of
             Nothing               -> return ()
@@ -56,6 +54,10 @@ startGame draw getInput = uncurry go L1.level []
                 in case addActors actors level ! new of
                     Empty -> evalActor nextActor { actorPos = new }
                     _     -> evalActor nextActor
+
+            (DrawMap :>>= next) -> do
+                draw $ addActors actors level
+                evalActor actor { actorProg = next () }
 
 
 addActors :: [Actor ()] -> Level -> Level

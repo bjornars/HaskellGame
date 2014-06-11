@@ -12,6 +12,7 @@ player :: Coords -> Actor ()
 player initPos = Actor playerImg initPos prog
     where
     prog = do
+        drawMap
         action <- getUserAction
         case action of
             Quit     -> return ()

@@ -33,6 +33,7 @@ data ActorOp a where
     GetActorPosition :: ActorOp Coords
     GetUserAction :: ActorOp GAction
     MoveActor :: Coords -> ActorOp ()
+    DrawMap :: ActorOp ()
     ReadMap :: ActorOp Level
     ReadMapWithActors :: ActorOp Level
 
@@ -53,6 +54,10 @@ getRandom = singleton . GetRandom
 
 nextTick :: ActorP ()
 nextTick = singleton NextTick
+
+
+drawMap :: ActorP ()
+drawMap = singleton DrawMap
 
 
 getActorPosition :: ActorP Coords
