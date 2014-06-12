@@ -3,6 +3,9 @@ module Actor.Zombie (zombie) where
 import Control.Applicative
 import Control.Arrow
 import Control.Monad
+import Data.Array.IArray
+import Data.List
+import Data.Ord
 import Graphics.Vty
 import Types
 
@@ -16,10 +19,10 @@ zombie initPos = (ActorData zombieImg initPos False, prog)
     where
     prog = do
         pos   <- getActorPosition
-        level <- readMap
+        level <- readMapWithActors
         hero  <- liftM (actorPos . head . filter actorIsPlayer) getOtherActors
         dyx   <- if canSeeCoord level hero
-                  then return $ moveTowards level pos hero
+                  then return $ findMove level pos hero
                   else (moveDirs !!) <$> getRandom (0, length moveDirs)
         moveActor $ pos |+| dyx
         nextTick >> prog
@@ -33,9 +36,13 @@ canSeeCoord :: Level -> Coords -> Bool
 canSeeCoord _ _ = True
 
 
-moveTowards :: Coords -> Coords -> Coords
-moveTowards pos hero =
-    let vector = pos |-| hero
-        both   = join (***)
-        denom  = uncurry max $ both abs vector
-    in (-1, -1) |*| both (`div` denom) vector
+findMove :: Level -> Coords -> Coords -> Coords
+findMove level pos hero =
+    let candidates  = map (id &&& (pos |+|)) moveDirs
+        possible    = filter (isEmpty . snd) candidates
+        prioritized = map fst $ sortBy (comparing $ distance . snd) possible
+    in
+        if null prioritized then (0, 0) else head prioritized
+    where
+        isEmpty  = (== Empty) . (level !)
+        distance = vecLen . (|-| hero)

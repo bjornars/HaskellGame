@@ -35,7 +35,7 @@ startGame draw getInput =
                 stepActor next = evalActor $ (fst actor, next) <| actors'
             in case view $ snd actor of
                 (NextTick :>>= next) ->
-                -- this actor is done, move on to next actor
+                    -- this actor is done, move on to next actor
                     return $ Just $ actors' |>  (fst actor, next ())
 
                 (Return _) -> return Nothing
