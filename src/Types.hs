@@ -38,13 +38,14 @@ data ActorOp a where
     ReadMapWithActors :: ActorOp Level
 
 
-data Actor a = Actor
-             { actorImage :: Image
-             , actorPos :: Coords
-             , actorProg :: Program ActorOp a
-             }
+data ActorData = ActorData
+               { actorImage :: Image
+               , actorPos :: Coords
+               , isPlayer :: Bool
+               }
 
 
+type Actor  a = (ActorData, Program ActorOp a)
 type ActorP a = Program ActorOp a
 
 
@@ -81,7 +82,7 @@ readMapWithActors = singleton ReadMapWithActors
 
 
 drawActor :: Actor ()
-drawActor = Actor (string (with_fore_color def_attr bright_red) " ")  (0, 0) prog
+drawActor = (ActorData (string (with_fore_color def_attr bright_red) " ")  (0, 0) False, prog)
     where prog = drawMap >> nextTick >> prog
 
 

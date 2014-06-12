@@ -10,4 +10,5 @@ treasureImg = string (with_fore_color def_attr bright_yellow) "T"
 
 
 treasure :: Coords -> Actor ()
-treasure pos = Actor treasureImg pos $ forever nextTick
+treasure pos = (ActorData treasureImg pos False, prog)
+   where prog = forever nextTick

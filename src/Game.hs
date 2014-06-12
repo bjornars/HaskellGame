@@ -30,43 +30,46 @@ startGame draw getInput =
     -- Handle actor actions
     eval level = evalActor
         where
-        evalActor actors = let
-                actor = S.index actors 0
-                actors' = S.drop 1 actors in case view $ actorProg actor of
-            (NextTick :>>= next) ->
-            -- this actor is done, move on to next actor
-                return $ Just $ actors' |>  actor { actorProg = next () }
+        evalActor actors =
+            let
+                actor   = S.index actors 0
+                actors' = S.drop 1 actors
+            in case view $ snd actor of
+                (NextTick :>>= next) ->
+                -- this actor is done, move on to next actor
+                    return $ Just $ actors' |>  (fst actor, next ())
 
-            (Return _) -> return Nothing
+                (Return _) -> return Nothing
 
-            (GetRandom range :>>= next) -> do
-                randVal <- randomRIO range
-                evalActor $ actor { actorProg = next randVal } <| actors'
+                (GetRandom range :>>= next) -> do
+                    randVal <- randomRIO range
+                    evalActor $ (fst actor, next randVal) <| actors'
 
-            (ReadMap :>>= next) ->
-                evalActor $ actor { actorProg = next level } <| actors'
+                (ReadMap :>>= next) ->
+                    evalActor $ (fst actor, next level) <| actors'
 
-            (ReadMapWithActors :>>= next) ->
-                evalActor $ actor { actorProg = next $ addActors actors level } <| actors'
+                (ReadMapWithActors :>>= next) ->
+                    evalActor $ (fst actor, next $ addActors actors level) <| actors'
 
-            (GetUserAction :>>= next) -> do
-                action <- getInput
-                evalActor $ actor { actorProg = next action } <| actors'
+                (GetUserAction :>>= next) -> do
+                    action <- getInput
+                    evalActor $ (fst actor, next action) <| actors'
 
-            (GetActorPosition :>>= next) ->
-                evalActor $ actor { actorProg = next $ actorPos actor } <| actors'
+                (GetActorPosition :>>= next) ->
+                    evalActor $ (fst actor, next $ (actorPos . fst) actor) <| actors'
 
-            (MoveActor new :>>= next) ->
-                let nextActor = actor { actorProg = next () }
-                in case addActors actors level ! new of
-                    Empty -> evalActor $ nextActor { actorPos = new } <| actors'
-                    _     -> evalActor $ nextActor <| actors'
+                (MoveActor new :>>= next) ->
+                    let actorData = fst actor
+                        nextActor = case addActors actors level ! new of
+                            Empty -> actorData { actorPos = new }
+                            _     -> actorData
+                    in evalActor $ (nextActor, next ()) <| actors'
 
-            (DrawMap :>>= next) -> do
-                draw $ addActors actors level
-                evalActor $ actor { actorProg = next () } <| actors'
+                (DrawMap :>>= next) -> do
+                    draw $ addActors actors level
+                    evalActor $ (fst actor, next ()) <| actors'
 
 
 addActors :: Seq (Actor ()) -> Level -> Level
 addActors actors level = let actors' = toList actors in
-    level // map (actorPos &&& ActorBlock . actorImage) actors'
+    level // map ((actorPos &&& ActorBlock . actorImage) . fst) actors'

@@ -9,7 +9,7 @@ playerImg = string (with_fore_color def_attr bright_blue) "@"
 
 
 player :: Coords -> Actor ()
-player initPos = Actor playerImg initPos prog
+player initPos = (ActorData playerImg initPos True, prog)
     where
     prog = do
         action <- getUserAction

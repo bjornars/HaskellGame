@@ -9,7 +9,7 @@ zombieImg = string (with_fore_color def_attr bright_red) "Z"
 
 
 zombie :: Coords -> Actor ()
-zombie initPos = Actor zombieImg initPos prog
+zombie initPos = (ActorData zombieImg initPos False, prog)
     where
     prog = do
         pos <- getActorPosition
