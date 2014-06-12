@@ -37,7 +37,7 @@ canSeeCoord _ _ = True
 
 
 findMove :: Level -> Coords -> Coords -> Coords
-findMove level pos hero =
+findMove level pos target =
     let candidates  = map (id &&& (pos |+|)) moveDirs
         possible    = filter (isEmpty . snd) candidates
         prioritized = map fst $ sortBy (comparing $ distance . snd) possible
@@ -45,4 +45,4 @@ findMove level pos hero =
         if null prioritized then (0, 0) else head prioritized
     where
         isEmpty  = (== Empty) . (level !)
-        distance = vecLen . (|-| hero)
+        distance = vecLen . (|-| target)
