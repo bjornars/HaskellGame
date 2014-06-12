@@ -32,5 +32,6 @@ canSeeCoord _ _ = True
 moveTowards :: Coords -> Coords -> Coords
 moveTowards pos hero =
     let vector = pos |-| hero
-        denom  = uncurry max $ join (***) abs vector
-    in (-1, -1) |*| join (***) (`div` denom) vector
+        both   = join (***)
+        denom  = uncurry max $ both abs vector
+    in (-1, -1) |*| both (`div` denom) vector
