@@ -2,7 +2,6 @@ module Actor.Zombie (zombie) where
 
 import Control.Applicative
 import Control.Arrow
-import Control.Monad
 import Data.Array.IArray
 import Data.List
 import Data.Ord
@@ -20,7 +19,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog)
     prog = do
         pos   <- getActorPosition
         level <- readMapWithActors
-        hero  <- liftM (actorPos . head . filter actorIsPlayer) getOtherActors
+        hero  <- actorPos . head . filter actorIsPlayer <$> getOtherActors
         dyx   <- if canSeeCoord level hero
                   then return $ findMove level pos hero
                   else (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
