@@ -30,8 +30,9 @@ startGame draw getInput =
         where
         evalActor actors =
             let
-                actor   = S.index actors 0
-                actors' = S.drop 1 actors
+                actor          = S.index actors 0
+                actors'        = S.drop 1 actors
+                stepActor next = evalActor $ (fst actor, next) <| actors'
             in case view $ snd actor of
                 (NextTick :>>= next) ->
                 -- this actor is done, move on to next actor
@@ -41,20 +42,20 @@ startGame draw getInput =
 
                 (GetRandom range :>>= next) -> do
                     randVal <- randomRIO range
-                    evalActor $ (fst actor, next randVal) <| actors'
+                    stepActor $ next randVal
 
                 (ReadMap :>>= next) ->
-                    evalActor $ (fst actor, next level) <| actors'
+                    stepActor $ next level
 
                 (ReadMapWithActors :>>= next) ->
-                    evalActor $ (fst actor, next $ addActors actors level) <| actors'
+                    stepActor $ next $ addActors actors level
 
                 (GetUserAction :>>= next) -> do
                     action <- getInput
-                    evalActor $ (fst actor, next action) <| actors'
+                    stepActor $ next action
 
                 (GetActorPosition :>>= next) ->
-                    evalActor $ (fst actor, next $ (actorPos . fst) actor) <| actors'
+                    stepActor $ next $ (actorPos . fst) actor
 
                 (MoveActor new :>>= next) ->
                     let actorData = fst actor
@@ -65,7 +66,7 @@ startGame draw getInput =
 
                 (DrawMap :>>= next) -> do
                     draw $ addActors actors level
-                    evalActor $ (fst actor, next ()) <| actors'
+                    stepActor $ next ()
 
 
 addActors :: Seq (Actor ()) -> Level -> Level
