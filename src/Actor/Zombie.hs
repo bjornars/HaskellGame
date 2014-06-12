@@ -23,7 +23,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog)
         hero  <- liftM (actorPos . head . filter actorIsPlayer) getOtherActors
         dyx   <- if canSeeCoord level hero
                   then return $ findMove level pos hero
-                  else (moveDirs !!) <$> getRandom (0, length moveDirs)
+                  else (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
         moveActor $ pos |+| dyx
         nextTick >> prog
 
