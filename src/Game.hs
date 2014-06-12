@@ -72,4 +72,4 @@ startGame draw getInput =
 
 addActors :: Seq (Actor ()) -> Level -> Level
 addActors actors level = let actors' = toList actors in
-    level // map ((actorPos &&& ActorBlock . actorImage) . fst) actors'
+    level // map ((actorPos &&& ActorBlock) . fst) actors'

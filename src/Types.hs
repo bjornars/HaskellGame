@@ -42,7 +42,7 @@ data ActorData = ActorData
                { actorImage :: Image
                , actorPos :: Coords
                , isPlayer :: Bool
-               }
+               } deriving (Eq, Show)
 
 
 type Actor  a = (ActorData, Program ActorOp a)
@@ -89,7 +89,7 @@ drawActor = (ActorData (string (with_fore_color def_attr bright_red) " ")  (0, 0
 data Block = Wall
            | Empty
            | Void
-           | ActorBlock Image
+           | ActorBlock ActorData
            deriving (Eq, Show)
 
 (|-|), (|+|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)

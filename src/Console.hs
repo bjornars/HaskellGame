@@ -22,10 +22,10 @@ draw vty level = do
 
 
 drawCell :: Block -> Image
-drawCell Empty            = string (with_fore_color def_attr bright_black) "."
-drawCell Void             = string def_attr " "
-drawCell Wall             = string (with_fore_color def_attr bright_black) "X"
-drawCell (ActorBlock img) = img
+drawCell Empty              = string (with_fore_color def_attr bright_black) "."
+drawCell Void               = string def_attr " "
+drawCell Wall               = string (with_fore_color def_attr bright_black) "X"
+drawCell (ActorBlock actor) = actorImage actor
 
 
 type KeyMap = [(Event, GAction)]
