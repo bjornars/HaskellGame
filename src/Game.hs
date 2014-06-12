@@ -40,9 +40,8 @@ startGame draw getInput =
 
                 (Return _) -> return Nothing
 
-                (GetRandom range :>>= next) -> do
-                    randVal <- randomRIO range
-                    stepActor $ next randVal
+                (GetRandom range :>>= next) ->
+                    randomRIO range >>= stepActor . next
 
                 (ReadMap :>>= next) ->
                     stepActor $ next level
@@ -50,15 +49,14 @@ startGame draw getInput =
                 (ReadMapWithActors :>>= next) ->
                     stepActor $ next $ addActors actors level
 
-                (GetUserAction :>>= next) -> do
-                    action <- getInput
-                    stepActor $ next action
+                (GetUserAction :>>= next) ->
+                    getInput >>= stepActor . next
 
                 (GetActorPosition :>>= next) ->
                     stepActor $ next $ (actorPos . fst) actor
 
                 (GetOtherActors :>>= next) ->
-                    evalActor $ (fst actor, next $ toList $ fmap fst actors') <| actors'
+                    stepActor $ next $ toList $ fmap fst actors'
 
                 (MoveActor new :>>= next) ->
                     let actorData = fst actor
