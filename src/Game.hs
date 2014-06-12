@@ -57,6 +57,9 @@ startGame draw getInput =
                 (GetActorPosition :>>= next) ->
                     stepActor $ next $ (actorPos . fst) actor
 
+                (GetOtherActors :>>= next) ->
+                    evalActor $ (fst actor, next $ toList $ fmap fst actors') <| actors'
+
                 (MoveActor new :>>= next) ->
                     let actorData = fst actor
                         nextActor = case addActors actors level ! new of

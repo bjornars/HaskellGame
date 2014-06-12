@@ -30,6 +30,7 @@ type Level = LevelArray Block
 data ActorOp a where
     GetRandom :: Random a => (a, a) -> ActorOp a
     NextTick :: ActorOp ()
+    GetOtherActors :: ActorOp [ActorData]
     GetActorPosition :: ActorOp Coords
     GetUserAction :: ActorOp GAction
     MoveActor :: Coords -> ActorOp ()
@@ -41,7 +42,7 @@ data ActorOp a where
 data ActorData = ActorData
                { actorImage :: Image
                , actorPos :: Coords
-               , isPlayer :: Bool
+               , actorIsPlayer :: Bool
                } deriving (Eq, Show)
 
 
@@ -63,6 +64,10 @@ drawMap = singleton DrawMap
 
 getActorPosition :: ActorP Coords
 getActorPosition = singleton GetActorPosition
+
+
+getOtherActors :: ActorP [ActorData]
+getOtherActors = singleton GetOtherActors
 
 
 getUserAction :: ActorP GAction
@@ -92,6 +97,7 @@ data Block = Wall
            | ActorBlock ActorData
            deriving (Eq, Show)
 
-(|-|), (|+|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
+(|-|), (|+|), (|*|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
 (x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
 (x1, y1) |+| (x2, y2) = (x1 + x2, y1 + y2)
+(x1, y1) |*| (x2, y2) = (x1 * x2, y1 * y2)
