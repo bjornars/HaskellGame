@@ -7,7 +7,7 @@ import Control.Monad.Operational
 import Data.Array.IArray hiding (range)
 import System.Random (randomRIO)
 import Data.Sequence ((|>), (<|), fromList, Seq)
-import Data.Foldable (toList)
+import Data.Foldable (toList, forM_)
 import qualified Data.Sequence as S
 
 import Types
@@ -23,9 +23,7 @@ startGame draw getInput =
         | S.null actors  = return ()
         | otherwise = do
         cont <- eval level actors
-        case cont of
-            Nothing      -> return ()
-            Just actors' -> go level actors'
+        forM_ cont $ go level
 
     -- Handle actor actions
     eval level = evalActor
