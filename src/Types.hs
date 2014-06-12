@@ -37,6 +37,7 @@ data ActorOp a where
     DrawMap :: ActorOp ()
     ReadMap :: ActorOp Level
     ReadMapWithActors :: ActorOp Level
+    SetActorImage :: Image -> ActorOp ()
 
 
 data ActorData = ActorData
@@ -84,6 +85,10 @@ readMap = singleton ReadMap
 
 readMapWithActors :: ActorP Level
 readMapWithActors = singleton ReadMapWithActors
+
+
+setActorImage :: Image -> ActorP ()
+setActorImage = singleton . SetActorImage
 
 
 drawActor :: Actor ()

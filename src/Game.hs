@@ -65,6 +65,10 @@ startGame draw getInput =
                             _     -> actorData
                     in evalActor $ (nextActor, next ()) <| actors'
 
+                (SetActorImage img :>>= next) ->
+                    let actor' = (fst actor) { actorImage = img }
+                    in evalActor $ (actor', next ()) <| actors'
+
                 (DrawMap :>>= next) -> do
                     draw $ addActors actors level
                     stepActor $ next ()
