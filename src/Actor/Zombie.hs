@@ -10,7 +10,11 @@ import Types
 
 
 zombieImg :: Image
-zombieImg = string (with_fore_color def_attr bright_red) "Z"
+zombieImg = string (with_fore_color def_attr bright_green) "Z"
+
+
+awareZombieImg :: Image
+awareZombieImg = string (with_fore_color def_attr bright_red) "Z"
 
 
 zombie :: Coords -> Actor ()
@@ -20,9 +24,13 @@ zombie initPos = (ActorData zombieImg initPos False, prog)
         pos   <- getActorPosition
         level <- readMapWithActors
         hero  <- actorPos . head . filter actorIsPlayer <$> getOtherActors
-        dyx   <- if canSeeCoord level hero
-                  then return $ findMove level pos hero
-                  else (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
+        dyx   <- if canSeeCoord level pos hero
+                  then do
+                      setActorImage awareZombieImg
+                      return $ findMove level pos hero
+                  else do
+                      setActorImage zombieImg
+                      (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
         moveActor $ pos |+| dyx
         nextTick >> prog
 
@@ -31,8 +39,15 @@ moveDirs :: [Coords]
 moveDirs = [(-1, 0), (1, 0), (0, 1), (0, -1)]
 
 
-canSeeCoord :: Level -> Coords -> Bool
-canSeeCoord _ _ = True
+canSeeCoord :: Level -> Coords -> Coords -> Bool
+canSeeCoord level pos target =
+    let (dy, dx) = target |-| pos
+        cellPath = map (pos |+|) [(y, x) | y <- enum dy, x <- enum dx]
+    in
+        not $ any isWall cellPath
+    where
+        enum to = if to == 0 then [0] else [0, to `div` abs to .. to]
+        isWall = (== Wall) . (level !)
 
 
 findMove :: Level -> Coords -> Coords -> Coords
