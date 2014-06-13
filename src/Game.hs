@@ -4,7 +4,7 @@ module Game (startGame) where
 
 import Control.Arrow ((&&&))
 import Control.Monad.Operational
-import Data.Array.IArray hiding (range)
+import Data.Array.IArray ((//), (!))
 import System.Random (randomRIO)
 import Data.Sequence ((|>), (<|), fromList, Seq)
 import Data.Foldable (toList, forM_)
