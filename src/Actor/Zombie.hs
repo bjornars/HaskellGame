@@ -16,15 +16,22 @@ zombieImg = string (with_fore_color def_attr bright_green) "Z"
 awareZombieImg :: Image
 awareZombieImg = string (with_fore_color def_attr bright_red) "Z"
 
+data ZombieState = ZombieState {
+    timeSinceHasSeen :: Integer
+}
 
 zombie :: Coords -> Actor ()
-zombie initPos = (ActorData zombieImg initPos False, prog)
+zombie initPos = (ActorData zombieImg initPos False, prog (ZombieState 999))
     where
-    prog = do
+    rememberActorTurns = 7
+    prog state = do
         pos   <- getActorPosition
         level <- readMapWithActors
         hero  <- actorPos . head . filter actorIsPlayer <$> getOtherActors
-        dyx   <- if canSeeCoord level pos hero
+        let canSee = canSeeCoord level pos hero
+            timeSinceHasSeen' = if canSee then 0 else timeSinceHasSeen state + 1
+
+        dyx   <- if canSee || timeSinceHasSeen state < rememberActorTurns
                   then do
                       setActorImage awareZombieImg
                       return $ findMove level pos hero
@@ -32,7 +39,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog)
                       setActorImage zombieImg
                       (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
         moveActor $ pos |+| dyx
-        nextTick >> prog
+        nextTick >> prog state { timeSinceHasSeen = timeSinceHasSeen' }
 
 
 moveDirs :: [Coords]
