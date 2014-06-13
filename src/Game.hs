@@ -2,6 +2,7 @@
 
 module Game (startGame) where
 
+import Control.Applicative
 import Control.Arrow ((&&&))
 import Control.Monad.Operational
 import Data.Array.IArray ((//), (!))
@@ -72,6 +73,18 @@ startGame draw getInput =
                 (DrawMap :>>= next) -> do
                     draw $ addActors actors level
                     stepActor $ next ()
+
+                (KillActor :>>= _) ->
+                    evalActor actors'
+
+                (HurtActor (target, _) :>>= next) ->
+                    -- ignore amount for now, instakill!
+                    let nextActors = (fst actor, next()) <| actors'
+                        inflict (someActor, prog) = if target == someActor
+                            then (someActor, killActor >> prog)
+                            else (someActor, prog)
+                    in
+                        evalActor $ inflict <$> nextActors
 
 
 addActors :: Seq (Actor ()) -> Level -> Level

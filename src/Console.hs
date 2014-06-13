@@ -42,6 +42,7 @@ defaultKeys =
     ,(EvKey (KASCII 'a') [], Move DLeft)
     ,(EvKey KRight [],       Move DRight)
     ,(EvKey (KASCII 'd') [], Move DRight)
+    ,(EvKey (KASCII ' ') [], Attack)
     ]
 
 

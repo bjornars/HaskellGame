@@ -38,6 +38,8 @@ data ActorOp a where
     ReadMap :: ActorOp Level
     ReadMapWithActors :: ActorOp Level
     SetActorImage :: Image -> ActorOp ()
+    KillActor :: ActorOp ()
+    HurtActor :: (ActorData, Integer) -> ActorOp ()
 
 
 data ActorData = ActorData
@@ -89,6 +91,13 @@ readMapWithActors = singleton ReadMapWithActors
 
 setActorImage :: Image -> ActorP ()
 setActorImage = singleton . SetActorImage
+
+killActor :: ActorP ()
+killActor = singleton KillActor
+
+
+hurtActor :: (ActorData, Integer) -> ActorP ()
+hurtActor = singleton . HurtActor
 
 
 drawActor :: Actor ()
