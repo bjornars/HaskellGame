@@ -110,11 +110,3 @@ data Block = Wall
            | Void
            | ActorBlock ActorData
            deriving (Eq, Show)
-
-(|-|), (|+|), (|*|) :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
-(x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
-(x1, y1) |+| (x2, y2) = (x1 + x2, y1 + y2)
-(x1, y1) |*| (x2, y2) = (x1 * x2, y1 * y2)
-
-vecLen :: Coords -> Double
-vecLen (x, y) = sqrt $ fromInteger $ x^(2 :: Int) + y^(2 :: Int)

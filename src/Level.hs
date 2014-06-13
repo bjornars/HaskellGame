@@ -6,6 +6,7 @@ module Level
 
 import Data.Array.IArray
 import Types
+import Utils
 
 
 chrToBlock :: Char -> Block

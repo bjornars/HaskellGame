@@ -7,6 +7,7 @@ import Data.List
 import Data.Ord
 import Graphics.Vty
 import Types
+import Utils
 
 
 zombieImg :: Image
@@ -66,4 +67,5 @@ findMove level pos target =
         if null prioritized then (0, 0) else head prioritized
     where
         isEmpty  = (== Empty) . (level !)
-        distance = vecLen . (|-| target)
+        distance :: Coords -> Double
+        distance = vecLen . toVec . (|-| target)

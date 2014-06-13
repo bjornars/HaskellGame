@@ -4,6 +4,7 @@ import Control.Applicative
 import Control.Monad
 import Graphics.Vty
 import Types
+import Utils
 
 import Data.List
 import Data.Ord
@@ -15,7 +16,8 @@ playerImg = string (with_fore_color def_attr bright_blue) "@"
 player :: Coords -> Actor ()
 player initPos = (ActorData playerImg initPos True, prog)
     where
-    distance target = vecLen . (|-| target)
+    distance :: Coords -> Coords -> Double
+    distance target = vecLen . toVec . (|-| target)
     prog = do
         action <- getUserAction
         case action of
