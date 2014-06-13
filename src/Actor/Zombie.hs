@@ -49,12 +49,8 @@ moveDirs = [(-1, 0), (1, 0), (0, 1), (0, -1)]
 
 canSeeCoord :: Level -> Coords -> Coords -> Bool
 canSeeCoord level pos target =
-    let (dy, dx) = target |-| pos
-        cellPath = map (pos |+|) [(y, x) | y <- enum dy, x <- enum dx]
-    in
-        not $ any isWall cellPath
+    not $ any isWall $ interpolate pos target
     where
-        enum to = if to == 0 then [0] else [0, to `div` abs to .. to]
         isWall = (== Wall) . (level !)
 
 
