@@ -22,5 +22,6 @@ executable FunctorsAndDragons
                        base,
                        containers,
                        operational,
+                       PSQueue,
                        random,
                        vty ==4.*
