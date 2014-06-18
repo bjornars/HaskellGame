@@ -32,7 +32,12 @@ calcPath level start stop = go (singleton (start, 0)  (dist start)) S.empty M.em
           (Just (m, rest)) -> let ((square, gcost) :-> fcost) = m
                                   in
                               if square == stop then Just $ reverse $ makePath path square
-                              else let (queue', seen', path') = foldr (processNeighbor (gcost + 1) square) (rest, square `S.insert` seen, path) (options square) in go queue' seen' path'
+                              else let
+                                  seed = (rest, square `S.insert` seen, path)
+                                  step = processNeighbor (gcost + 1) square
+                                  (queue', seen', path') = foldr step seed $ options square
+                                    in
+                                  go queue' seen' path'
           (Nothing) -> Nothing
 
         -- processNeighbor :: (Coords, Cost) -> (PriQ, Set) -> (PriQ, Set)
@@ -48,14 +53,10 @@ calcPath level start stop = go (singleton (start, 0)  (dist start)) S.empty M.em
         dist c1 = let absSum (x, y) = abs x + abs y in absSum $ c1 |-| stop
 
         options :: Coords -> [Coords]
-        options square = availables
-          where
-              possibles = map (square |+|) [(-1, 0), (1, 0), (0, 1), (0, -1)]
-              availables :: [Coords]
-              availables = filter ((== Empty) . (level!)) possibles
+        options = filter ((== Empty) . (level!)) . availables
+            where availables square = map (square |+|) [(-1, 0), (1, 0), (0, 1), (0, -1)]
 
-        makePath path = mk
-            where
-              mk square = case M.lookup square path of
-                (Just src) -> src : mk src
+        makePath path square =
+            case M.lookup square path of
+                (Just src) -> src : makePath path src
                 (Nothing) -> []
