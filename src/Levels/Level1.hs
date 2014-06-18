@@ -2,6 +2,7 @@ module Levels.Level1 (level) where
 
 import Level
 import Types
+import Actor.Dog
 import Actor.Player
 import Actor.Treasure
 import Actor.Zombie
@@ -17,7 +18,7 @@ blueprint =
     ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.ZZZZZ...........XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.ZZZZZ...........XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXXXXXXXXXXXXXXX...................XXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
-    ,"X....XXXXXX.........XXXX....................XXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
+    ,"X....XXXXXX.........XXXX....................XXXXXXXXXXXX...D.XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.....XXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
     ,"X....XXXXXX.........XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..........XXXXX"
@@ -44,4 +45,4 @@ blueprint =
 
 
 level :: (Level, [Actor ()])
-level = loadLevel blueprint [('@', player), ('T', treasure), ('Z', zombie)]
+level = loadLevel blueprint [('@', player), ('T', treasure), ('Z', zombie), ('D', dog)]
