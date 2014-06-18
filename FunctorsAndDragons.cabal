@@ -19,7 +19,7 @@ executable FunctorsAndDragons
   hs-source-dirs:      src
   -- other-modules:       
   build-depends:       array,
-                       base ==4.6.*,
+                       base,
                        containers,
                        operational,
                        random,
