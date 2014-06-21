@@ -4,11 +4,14 @@ import Control.Arrow
 import Control.Monad
 import Types
 
+-- lift a binary operator to work pairwise on tuples
+liftVec :: Num a => (a -> a -> a) -> (a, a) -> (a, a) -> (a, a)
+liftVec f (x1, y1) (x2, y2) = (f x1 x2, f y1 y2)
 
 (|-|), (|+|), (|*|) :: Num a => (a, a) -> (a, a) -> (a, a)
-(x1, y1) |-| (x2, y2) = (x1 - x2, y1 - y2)
-(x1, y1) |+| (x2, y2) = (x1 + x2, y1 + y2)
-(x1, y1) |*| (x2, y2) = (x1 * x2, y1 * y2)
+(|-|) = liftVec (-)
+(|+|) = liftVec (+)
+(|*|) = liftVec (*)
 
 
 both :: (a -> b) -> (a, a) -> (b, b)
