@@ -2,6 +2,7 @@
 
 module Pathfinding where
 
+import Control.Monad
 import Data.Array ((!))
 import Data.PSQueue (Binding(..), minView, keys, insert, singleton, PSQ)
 import Data.List (unfoldr)
@@ -29,17 +30,17 @@ calcPath level start stop
     | otherwise     = go (singleton (start, 0)  (dist start)) S.empty M.empty
     where
         go :: PriQ -> Set -> M.Map Coords Coords -> Maybe [Coords]
-        go queue seen path = case minView queue of
-          (Just (m, rest)) -> let ((square, gcost) :-> fcost) = m
-                                  in
-                              if square == stop then Just $ reverse $ square: makePath path square
-                              else let
-                                  seed = (rest, square `S.insert` seen, path)
-                                  step = processNeighbor (gcost + 1) square
-                                  (queue', seen', path') = foldr step seed $ options square
-                                    in
-                                  go queue' seen' path'
-          (Nothing) -> Nothing
+        go queue seen path = minView queue >>= go'
+          where
+            go' ((square, gcost) :-> fcost, rest) =
+              if square == stop then return . reverse . (square:) $ makePath path square
+              else let
+                  seed = (rest, square `S.insert` seen, path)
+                  step = processNeighbor (gcost + 1) square
+                  (queue', seen', path') = foldr step seed $ options square
+                    in
+                  go queue' seen' path'
+
 
         -- processNeighbor :: (Coords, Cost) -> (PriQ, Set) -> (PriQ, Set)
         processNeighbor gcost source square (queue, seen, path)
