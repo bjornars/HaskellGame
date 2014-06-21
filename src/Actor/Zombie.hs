@@ -9,12 +9,10 @@ import Types
 import Utils
 
 
-zombieImg :: Image
-zombieImg = string (with_fore_color def_attr bright_green) "Z"
-
-
-awareZombieImg :: Image
-awareZombieImg = string (with_fore_color def_attr bright_red) "Z"
+zombieImg, awareZombieImg, rememberZombieImg :: Image
+zombieImg         = string (with_fore_color def_attr bright_green) "Z"
+awareZombieImg    = string (with_fore_color def_attr bright_red) "Z"
+rememberZombieImg = string (with_fore_color def_attr red) "Z"
 
 data ZombieState = ZombieState
                  { forgetTimer :: Integer
@@ -43,7 +41,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog initState)
 
         dyx <- case target of
             Just target' -> do
-                setActorImage awareZombieImg
+                setActorImage $ if canSee then awareZombieImg else rememberZombieImg
                 return $ case path of
                     Just (x:_) -> x |-| pos
                     _          -> (0, 0)
