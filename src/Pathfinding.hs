@@ -37,12 +37,11 @@ calcPath level start stop
               else let
                   seed = (rest, square `S.insert` seen, path)
                   step = processNeighbor (gcost + 1) square
-                  (queue', seen', path') = foldr step seed $ options square
                     in
-                  go queue' seen' path'
+                  uncurry3 go $ foldr step seed $ options square
 
+        uncurry3 f (a, b, c) = f a b c
 
-        -- processNeighbor :: (Coords, Cost) -> (PriQ, Set) -> (PriQ, Set)
         processNeighbor gcost source square (queue, seen, path)
             | square `S.member` seen = (queue, seen, path)  -- todo: check for improvement
             | otherwise             = let fcost = gcost + dist square in
