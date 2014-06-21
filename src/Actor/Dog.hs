@@ -23,7 +23,7 @@ dog initPos = (ActorData img initPos False, prog )
         level <- readMap
         hero  <- actorPos . head . filter actorIsPlayer <$> getOtherActors
         case calcPath level pos hero of
-             (Just (_:x:_)) -> moveActor x
+             (Just (x:_)) -> moveActor x
              _           -> return ()
 
         nextTick >> prog
