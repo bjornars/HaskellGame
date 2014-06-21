@@ -1,11 +1,10 @@
 module Actor.Zombie (zombie) where
 
 import Control.Applicative
-import Control.Arrow
+import Control.Monad
 import Data.Array.IArray
-import Data.List
-import Data.Ord
 import Graphics.Vty
+import Pathfinding
 import Types
 import Utils
 
@@ -32,6 +31,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog initState)
     prog state = do
         pos   <- getActorPosition
         level <- readMapWithActors
+        pathfindLevel <- readMap
         hero  <- actorPos . head . filter actorIsPlayer <$> getOtherActors
 
         let canSee = canSeeCoord level pos hero
@@ -39,11 +39,14 @@ zombie initPos = (ActorData zombieImg initPos False, prog initState)
             target | canSee    = Just hero
                    | timer > 0 = trackPoint state
                    | otherwise = Nothing
+            path = target >>= calcPath pathfindLevel pos
 
         dyx <- case target of
             Just target' -> do
                 setActorImage awareZombieImg
-                return $ findMove level pos target'
+                return $ case path of
+                    Just (x:_) -> x |-| pos
+                    _          -> (0, 0)
             Nothing -> do
                 setActorImage zombieImg
                 (moveDirs !!) <$> getRandom (0, length moveDirs - 1)
@@ -63,16 +66,3 @@ canSeeCoord level pos target =
     not $ any isWall $ interpolate pos target
     where
         isWall = (== Wall) . (level !)
-
-
-findMove :: Level -> Coords -> Coords -> Coords
-findMove level pos target =
-    let candidates  = map (id &&& (pos |+|)) moveDirs
-        possible    = filter (isEmpty . snd) candidates
-        prioritized = map fst $ sortBy (comparing $ distance . snd) possible
-    in
-        if null prioritized then (0, 0) else head prioritized
-    where
-        isEmpty  = (== Empty) . (level !)
-        distance :: Coords -> Double
-        distance = vecLen . toVec . (|-| target)
