@@ -101,7 +101,7 @@ hurtActor = singleton . HurtActor
 
 
 drawActor :: Actor ()
-drawActor = (ActorData (string (with_fore_color def_attr bright_red) " ")  (0, 0) False, prog)
+drawActor = (ActorData (string (withForeColor defAttr brightRed) " ")  (0, 0) False, prog)
     where prog = drawMap >> nextTick >> prog
 
 

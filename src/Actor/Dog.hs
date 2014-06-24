@@ -12,7 +12,7 @@ import Utils
 
 
 img :: Image
-img = string (with_fore_color def_attr bright_blue) "D"
+img = string (withForeColor defAttr brightBlue) "D"
 
 
 dog :: Coords -> Actor ()

@@ -6,7 +6,7 @@ import Types
 
 
 treasureImg :: Image
-treasureImg = string (with_fore_color def_attr bright_yellow) "T"
+treasureImg = string (withForeColor defAttr brightYellow) "T"
 
 
 treasure :: Coords -> Actor ()

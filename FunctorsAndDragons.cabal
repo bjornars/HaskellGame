@@ -21,7 +21,8 @@ executable FunctorsAndDragons
   build-depends:       array,
                        base,
                        containers,
+                       data-default,
                        operational,
                        PSQueue,
                        random,
-                       vty ==4.*
+                       vty >=5.0.0

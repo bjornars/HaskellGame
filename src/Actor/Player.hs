@@ -10,7 +10,7 @@ import Data.List
 import Data.Ord
 
 playerImg :: Image
-playerImg = string (with_fore_color def_attr bright_blue) "@"
+playerImg = string (withForeColor defAttr brightBlue) "@"
 
 
 player :: Coords -> Actor ()

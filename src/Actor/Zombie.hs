@@ -10,9 +10,9 @@ import Utils
 
 
 zombieImg, awareZombieImg, rememberZombieImg :: Image
-zombieImg         = string (with_fore_color def_attr bright_green) "Z"
-awareZombieImg    = string (with_fore_color def_attr bright_red) "Z"
-rememberZombieImg = string (with_fore_color def_attr red) "Z"
+zombieImg         = string (withForeColor defAttr brightGreen) "Z"
+awareZombieImg    = string (withForeColor defAttr brightRed) "Z"
+rememberZombieImg = string (withForeColor defAttr red) "Z"
 
 data ZombieState = ZombieState
                  { forgetTimer :: Integer
