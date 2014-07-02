@@ -34,64 +34,62 @@ startGame draw getInput =
         forM_ cont $ go level
 
     -- Handle actor actions
-    eval level = evalActor
-        where
-        evalActor actors =
-            let
-                actor          = S.index actors 0
-                actors'        = S.drop 1 actors
-                stepActor next = evalActor $ (fst actor, next) <| actors'
-            in case view $ snd actor of
-                (NextTick :>>= next) ->
-                    -- this actor is done, move on to next actor
-                    return $ Just $ actors' |>  (fst actor, next ())
+    eval level actors =
+        let
+            actor          = S.index actors 0
+            actors'        = S.drop 1 actors
+            stepActor next = eval level $ (fst actor, next) <| actors'
+        in case view $ snd actor of
+            (NextTick :>>= next) ->
+                -- this actor is done, move on to next actor
+                return $ Just $ actors' |>  (fst actor, next ())
 
-                (Return _) -> return Nothing
+            (Return _) -> return Nothing
 
-                (GetRandom range :>>= next) ->
-                    randomRIO range >>= stepActor . next
+            (GetRandom range :>>= next) ->
+                randomRIO range >>= stepActor . next
 
-                (ReadMap :>>= next) ->
-                    stepActor $ next level
+            (ReadMap :>>= next) ->
+                stepActor $ next level
 
-                (ReadMapWithActors :>>= next) ->
-                    stepActor $ next $ addActors actors level
+            (ReadMapWithActors :>>= next) ->
+                stepActor $ next $ addActors actors level
 
-                (GetUserAction :>>= next) ->
-                    getInput >>= stepActor . next
+            (GetUserAction :>>= next) ->
+                getInput >>= stepActor . next
 
-                (GetActorPosition :>>= next) ->
-                    stepActor $ next $ (actorPos . fst) actor
+            (GetActorPosition :>>= next) ->
+                stepActor $ next $ (actorPos . fst) actor
 
-                (GetOtherActors :>>= next) ->
-                    stepActor $ next $ toList $ fmap fst actors'
+            (GetOtherActors :>>= next) ->
+                stepActor $ next $ toList $ fmap fst actors'
 
-                (MoveActor new :>>= next) ->
-                    let actorData = fst actor
-                        nextActor = case addActors actors level ! new of
-                            Empty -> actorData { actorPos = new }
-                            _     -> actorData
-                    in evalActor $ (nextActor, next ()) <| actors'
+            (MoveActor new :>>= next) ->
+                let actorData = fst actor
+                    nextActor = case addActors actors level ! new of
+                        Empty -> actorData { actorPos = new }
+                        _     -> actorData
+                in eval level $ (nextActor, next ()) <| actors'
 
-                (SetActorImage img :>>= next) ->
-                    let actor' = (fst actor) { actorImage = img }
-                    in evalActor $ (actor', next ()) <| actors'
+            (SetActorImage img :>>= next) ->
+                let actor' = (fst actor) { actorImage = img }
+                in eval level $ (actor', next ()) <| actors'
 
-                (DrawMap :>>= next) -> do
-                    draw $ addActors actors level
-                    stepActor $ next ()
+            (DrawMap :>>= next) -> do
+                draw $ addActors actors level
+                stepActor $ next ()
 
-                (KillActor :>>= _) ->
-                    evalActor actors'
+            (KillActor :>>= _) ->
+                eval level actors'
 
-                (HurtActor (target, _) :>>= next) ->
-                    -- ignore amount for now, instakill!
-                    let nextActors = (fst actor, next()) <| actors'
-                        inflict (someActor, prog) = if target == someActor
-                            then (someActor, killActor >> prog)
-                            else (someActor, prog)
-                    in
-                        evalActor $ inflict <$> nextActors
+            (HurtActor (target, _) :>>= next) ->
+                -- ignore amount for now, instakill!
+                let nextActors = (fst actor, next()) <| actors'
+                    inflict (someActor, prog) = if target == someActor
+                        then (someActor, killActor >> prog)
+                        else (someActor, prog)
+                in
+                    eval level $ inflict <$> nextActors
 
 
 addActors :: Seq (Actor ()) -> Level -> Level
