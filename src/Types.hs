@@ -100,11 +100,6 @@ hurtActor :: (ActorData, Integer) -> ActorP ()
 hurtActor = singleton . HurtActor
 
 
-drawActor :: Actor ()
-drawActor = (ActorData (string (withForeColor defAttr brightRed) " ")  (0, 0) False, prog)
-    where prog = drawMap >> nextTick >> prog
-
-
 data Block = Wall
            | Empty
            | Void

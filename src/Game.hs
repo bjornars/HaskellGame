@@ -10,9 +10,16 @@ import System.Random (randomRIO)
 import Data.Sequence ((|>), (<|), fromList, Seq)
 import Data.Foldable (toList, forM_)
 import qualified Data.Sequence as S
+import Graphics.Vty
 
 import Types
 import qualified Levels.Level1 as L1
+
+
+drawActor :: Actor ()
+drawActor = (ActorData (string (withForeColor defAttr brightRed) " ")  (0, 0) False, prog)
+    where prog = drawMap >> nextTick >> prog
+
 
 startGame :: (Level -> IO ()) -> IO GAction -> IO ()
 startGame draw getInput =
