@@ -8,7 +8,7 @@ import Control.Monad.Operational
 import Data.Array.IArray ((//), (!))
 import System.Random (randomRIO)
 import Data.Sequence ((|>), (<|), fromList, Seq)
-import Data.Foldable (toList, forM_)
+import Data.Foldable (toList)
 import qualified Data.Sequence as S
 import Graphics.Vty
 
@@ -26,12 +26,11 @@ startGame draw getInput =
     let (level, actors) = L1.level in
     go level $ fromList (drawActor:actors)
     where
+
     -- Main loop
     go level actors
-        | S.null actors  = return ()
-        | otherwise = do
-        cont <- eval level actors
-        forM_ cont $ go level
+        | S.null actors = return ()
+        | otherwise     = eval level actors >>= go level
 
     -- Handle actor actions
     eval level actors =
@@ -42,9 +41,9 @@ startGame draw getInput =
         in case view $ snd actor of
             (NextTick :>>= next) ->
                 -- this actor is done, move on to next actor
-                return $ Just $ actors' |>  (fst actor, next ())
+                return $ actors' |>  (fst actor, next ())
 
-            (Return _) -> return Nothing
+            (Return _) -> return (fromList [])
 
             (GetRandom range :>>= next) ->
                 randomRIO range >>= stepActor . next
