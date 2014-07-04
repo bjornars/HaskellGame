@@ -43,7 +43,7 @@ startGame draw getInput =
                 -- this actor is done, move on to next actor
                 return $ actors' |>  (fst actor, next ())
 
-            (Return _) -> return (fromList [])
+            (Return _) -> return S.empty
 
             (GetRandom range :>>= next) ->
                 randomRIO range >>= stepActor . next
