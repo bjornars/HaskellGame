@@ -2,9 +2,8 @@
 
 module Pathfinding where
 
-import Control.Monad
 import Data.Array ((!))
-import Data.PSQueue (Binding(..), minView, keys, insert, singleton, PSQ)
+import Data.PSQueue (Binding(..), minView, insert, singleton, PSQ)
 import Data.List (unfoldr)
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
@@ -32,7 +31,7 @@ calcPath level start stop
         go :: PriQ -> Set -> M.Map Coords Coords -> Maybe [Coords]
         go queue seen path = minView queue >>= go'
           where
-            go' ((square, gcost) :-> fcost, rest) =
+            go' ((square, gcost) :-> _, rest) =
               if square == stop then return . reverse . (square:) $ makePath path square
               else let
                   seed = (rest, square `S.insert` seen, path)
