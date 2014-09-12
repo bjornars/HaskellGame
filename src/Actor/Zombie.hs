@@ -1,7 +1,6 @@
 module Actor.Zombie (zombie) where
 
 import Control.Applicative
-import Control.Monad
 import Data.Array.IArray
 import Graphics.Vty
 import Pathfinding
@@ -40,7 +39,7 @@ zombie initPos = (ActorData zombieImg initPos False, prog initState)
             path = target >>= calcPath pathfindLevel pos
 
         dyx <- case target of
-            Just target' -> do
+            Just _  -> do
                 setActorImage $ if canSee then awareZombieImg else rememberZombieImg
                 return $ case path of
                     Just (x:_) -> x |-| pos
